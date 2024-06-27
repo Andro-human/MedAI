@@ -1,9 +1,21 @@
-const express = require('express')
+const express = require("express");
+const dotenv = require("dotenv");
+const morgan = require("morgan")
+const cors = require("cors");
+const connectDB = require("./config/db");
 
-const app = express()
+const app = express();
+dotenv.config();
 
-const PORT = 8080
+connectDB();
+app.use(express.json());
+app.use(cors());
+app.use(morgan('dev'))
+
+app.use("/api/test", require("./routes/testRoutes"));
+
+const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
-    console.log("Poddar weds Juhi")
-})
+  console.log(`The server is running on PORT: ${PORT}`);
+});
