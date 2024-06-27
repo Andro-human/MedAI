@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "user", "doctor"],
     },
     name: {
-      String,
+      type: String,
       required: true,
     },
     age: {
@@ -37,6 +37,7 @@ const userSchema = new mongoose.Schema(
         if (this.role === "user" || this.role === "doctor") return true;
         return false;
       },
+      min: 10
     },
     specialisation: {
       type: String,
