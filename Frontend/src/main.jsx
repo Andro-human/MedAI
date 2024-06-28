@@ -9,6 +9,10 @@ import Services from './Components/Services/Services.jsx'
 import Login from './Components/Login/Login.jsx'
 import Signup from './Components/Signup/Signup.jsx'
 import Contact from './Components/Contact/Contact.jsx'
+import AdminDashboard from './Components/AdminDashboard/AdminDashboard.jsx'
+import Doctors from './Components/Dashboard/Doctors/Doctors.jsx'
+import Patients from './Components/Dashboard/Patients/Patients.jsx'
+import Appointments from './Components/Dashboard/Appointments/Appointments.jsx'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -19,6 +23,11 @@ const router = createBrowserRouter(
       <Route path='Login' element={<Login/>} />
       <Route path='Signup' element={<Signup/>} />
       <Route path='Contact' element={<Contact/>} />
+      <Route path='dashboard' element={<AdminDashboard/>}>
+          <Route path='doctors' element={<Doctors/>} />
+          <Route path='patients' element={<Patients/>} />
+          <Route path='appointments' element={<Appointments/>}/>
+      </Route>
     </Route>
   )
 )

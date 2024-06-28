@@ -13,7 +13,6 @@ function App() {
 
   return (
     <>
-    <AdminDashboard/>
     <Navbar/>
     <Outlet/>
     <Footer/>
