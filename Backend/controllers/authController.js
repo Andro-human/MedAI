@@ -17,7 +17,7 @@ const registerController = async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
     req.body.password = hashedPassword;
 
-    console.log("req.body", req.body);
+    // console.log("req.body", req.body);
 
     const user = new userModel(req.body);
     await user.save();
@@ -45,6 +45,13 @@ const loginController = async (req, res) => {
         success: false,
         message: "Invalid Credentials",
       });
+
+    if (user.role !== req.body.role) {
+      return res.status(401).send({
+        success: false,
+        message: "Role doesn't match"
+      })
+    }
 
     const comparePassword = await bcrypt.compare(
       req.body.password,
