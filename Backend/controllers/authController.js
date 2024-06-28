@@ -49,8 +49,8 @@ const loginController = async (req, res) => {
     if (user.role !== req.body.role) {
       return res.status(401).send({
         success: false,
-        message: "Role doesn't match"
-      })
+        message: "Role doesn't match",
+      });
     }
 
     const comparePassword = await bcrypt.compare(
@@ -83,21 +83,22 @@ const loginController = async (req, res) => {
   }
 };
 
-const getUserController = async(req, res) => {
+const getUserController = async (req, res) => {
   try {
-    const user = await userModel.findOne({_id: req.body.userId});
+    const user = await userModel.findOne({ _id: req.body.userId });
+    // console.log(req.body.userId);
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "User not found"
-      })
+        message: "User not found",
+      });
     }
-    console.log(user)
+    // console.log(user);
     return res.status(200).send({
-        success: true,
-        message: "User fetched successfully",
-        user
-    })
+      success: true,
+      message: "User fetched successfully",
+      user,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send({
@@ -106,7 +107,8 @@ const getUserController = async(req, res) => {
       error,
     });
   }
-   
-}
+};
+
+
 
 module.exports = { registerController, loginController, getUserController };

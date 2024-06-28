@@ -19,6 +19,14 @@ const userSchema = new mongoose.Schema(
       },
       min: 0,
     },
+    gender: {
+      type: String,
+      required: function () {
+        if (this.role === "user" || this.role === "doctor") return true;
+        return false;
+      },
+      enum: ["male", "female"]
+    },
     email: {
       type: String,
       require: [true, "email is required"],
