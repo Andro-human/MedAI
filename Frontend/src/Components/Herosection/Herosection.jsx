@@ -1,8 +1,9 @@
 import React from 'react'
-
+import hero from '../../assets/heroright.png'
 function Herosection() {
   return (
-    <div className=' flex flex-row justify-around h-[100vh]'>
+    <div 
+    className=' flex flex-row justify-around h-[100vh]'>
       <div className='flex flex-col space-y-6 justify-center items-center'>
         <div className='space-y-6'>
             <h1 className='text-6xl font-bold'>Get Appointment</h1>
@@ -20,7 +21,8 @@ function Herosection() {
         </div>
       </div>
       <div>
-        <img src='/../assets/heroright.png' alt='doctor image'/>
+        {/* image */}
+       <img src={hero} alt=""  className='h-full w-full'/>
       </div>
     </div>
   )
