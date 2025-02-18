@@ -17,7 +17,6 @@ const registerController = async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
     req.body.password = hashedPassword;
 
-    // console.log("req.body", req.body);
 
     const user = new userModel(req.body);
     await user.save();
@@ -27,7 +26,6 @@ const registerController = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).send({
       success: false,
       message: "Error in Register API",
@@ -40,6 +38,9 @@ const loginController = async (req, res) => {
   try {
     // const user = req.body;
     const user = await userModel.findOne({ email: req.body.email });
+    console.log(user.role, user.role.length);
+    console.log("BREAK");
+    console.log(req.body.role, req.body.role.length);
     if (!user)
       return res.status(404).send({
         success: false,
@@ -57,6 +58,8 @@ const loginController = async (req, res) => {
       req.body.password,
       user.password
     );
+
+    console.log("reached", user.password);
     if (!comparePassword) {
       return res.status(401).send({
         success: false,
@@ -108,7 +111,5 @@ const getUserController = async (req, res) => {
     });
   }
 };
-
-
 
 module.exports = { registerController, loginController, getUserController };

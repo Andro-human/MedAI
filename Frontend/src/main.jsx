@@ -14,6 +14,7 @@ import Doctors from './Components/Dashboard/Doctors/Doctors.jsx'
 import Patients from './Components/Dashboard/Patients/Patients.jsx'
 import Appointments from './Components/Dashboard/Appointments/Appointments.jsx'
 import DoctorDashboard from './Components/DoctorDashboard/DoctorDashboard.jsx'
+import ProtectedRoute from './Components/Routes/ProtectedRoutes.js'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -27,7 +28,7 @@ const router = createBrowserRouter(
       <Route path='dashboard' element={<AdminDashboard/>}>
           <Route path='doctors' element={<Doctors/>} />
           <Route path='patients' element={<Patients/>} />
-          <Route path='appointments' element={<Appointments/>}/>
+          <Route path='appointments' element={<ProtectedRoute><Appointments/></ProtectedRoute>}/>
       </Route>
       <Route path='doctordashboard' element={<DoctorDashboard/>}/>
     </Route>
@@ -35,7 +36,5 @@ const router = createBrowserRouter(
 )
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
     <RouterProvider router={router}/>
-  </React.StrictMode>,
 )
