@@ -2,15 +2,29 @@
 
 import React, { useState } from 'react';
 import slidebar from '../../assets/sidebar.png'
+// import toast from 'react-toastify'
 import './Log.css'
+import { userLogin, userRegister } from '../Services/AuthAction';
+import { toast } from 'react-toastify';
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [role,setrole] = useState('');
   const handleSubmit = (e) => {
     e.preventDefault();
+    try {
+      console.log(email, role, password)
+      if (!email || !password || !role) {
+        toast.error("Please enter all fields")
+        return;
+    }
+      userLogin({role, email, password})  
+    } catch (error) {
+      console.log(error)
+    }
     // Handle form submission logic here (e.g., API call)
-    console.log('Form submitted:', { username, password,role });
+    
+    // console.log('Form submitted:', { username, password,role });
   };
 
   return (
@@ -51,7 +65,7 @@ const Login = () => {
           <input
             type="text"
             id="username"
-            value={username}
+            value={email}
             onChange={(e) => setUsername(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="Enter your username"

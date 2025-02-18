@@ -97,7 +97,7 @@ function Contact() {
               </p>
 
               <p className="text-xl font-bold text-white sm:text-2xl">
-                Harsh Poddar
+                Saniya Khan
               </p>
 
               <div className="mt-32 sm:mt-48 lg:mt-64">
@@ -123,7 +123,7 @@ function Contact() {
               </p>
 
               <p className="text-xl font-bold text-white sm:text-2xl">
-                Simran Kumari
+                Anjali
               </p>
 
               <div className="mt-32 sm:mt-48 lg:mt-64">

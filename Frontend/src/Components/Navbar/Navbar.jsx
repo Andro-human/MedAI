@@ -1,6 +1,8 @@
 import React from 'react'
 import logo from '../../assets/logo.png'
 import { Link,NavLink ,Navigate } from 'react-router-dom'
+import MedAi from "../../assets/MedAi.png"
+
 function Navbar() {
   return (
     
@@ -9,8 +11,9 @@ function Navbar() {
         <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
             <Link to="/" className="flex items-center">
                 <img
-                    src={logo}
-                    className="h-16 mr-5 "
+                    src={MedAi}
+                    className="mr-3 h-12"
+
                     alt="Logo"
                 />
             </Link>

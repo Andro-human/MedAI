@@ -65,7 +65,7 @@ const userSchema = new mongoose.Schema(
     experience: {
       type: Number,
       required: function () {
-        if (this.rolee === "doctor") return true;
+        if (this.role === "doctor") return true;
         return false;
       },
     },

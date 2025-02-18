@@ -1,10 +1,13 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
+
 import hero from "../../assets/hero.png";
+import { userAppointment } from "../Services/AuthAction";
 const Form = () => {
   const [formData, setFormData] = useState({
     doctorName: "",
     date: "",
-    departmemt:"",
+    specialisation:"",
     time: "",
   });
 
@@ -16,10 +19,19 @@ const Form = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e, date, time, specialisation, doctorName) => {
     e.preventDefault();
     // Handle form submission logic here
-    console.log(formData); // For testing
+    // console.log(formData); // For testing
+    try {
+      if (!date || !time || !specialisation || !doctorName) {
+          toast.error("Please enter all fields")
+          return;
+      }
+      userAppointment({date, time, specialisation, doctorName})
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   return (
@@ -107,16 +119,16 @@ const Form = () => {
           </div>
           <div className="mb-4">
             <label
-              htmlFor="doctorName"
+              htmlFor="specialisation"
               className="block text-sm font-medium text-white"
             >
-              Department
+              Specialisation
             </label>
             <input
               type="text"
-              id="doctorName"
-              name="doctorName"
-              value={formData.doctorName}
+              id="specialisation"
+              name="specialisation"
+              value={formData.specialisation}
               onChange={handleChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring-blue-500"
               required

@@ -1,5 +1,3 @@
-import React from 'react'
-
 function DoctorDashboard() {
 
   const handlecheck = (e)=>{
@@ -8,9 +6,9 @@ function DoctorDashboard() {
   }
 
   return (
-    <div className='h-screen mt-2'>
+    <div className="h-screen mt-2">
       <div>
-        <h2 className='text-xl font-bold text-center'>Welcome Doctor</h2>
+        <h2 className="text-xl font-bold text-center">Welcome Doctor</h2>
       </div>
       <div className='w-full h-full flex flex-col gap-y-3 p-8'>
         {/* wrap the doctor content */}
@@ -23,7 +21,7 @@ function DoctorDashboard() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default DoctorDashboard
+export default DoctorDashboard;
