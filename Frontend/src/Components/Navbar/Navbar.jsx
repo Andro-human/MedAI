@@ -1,4 +1,5 @@
 import React from 'react'
+import logo from '../../assets/logo.png'
 import { Link,NavLink ,Navigate } from 'react-router-dom'
 import MedAi from "../../assets/MedAi.png"
 
@@ -12,6 +13,7 @@ function Navbar() {
                 <img
                     src={MedAi}
                     className="mr-3 h-12"
+
                     alt="Logo"
                 />
             </Link>
@@ -24,7 +26,7 @@ function Navbar() {
                 </Link>
                 <Link
                     to='Signup'
-                    className="text-white bg-orange-700 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none"
+                    className="text-white bg-sky-700 hover:bg-sky-800 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none"
                 >
                     Get started
                 </Link>
@@ -38,8 +40,8 @@ function Navbar() {
                         <NavLink
                         to='/'
                             className={({isActive}) =>
-                                `block py-2 pr-4 pl-3 duration-200 ${isActive? "text-orange-700":"text-grey-700"} border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 
-                                hover:text-orange-700 lg:p-0`
+                                `block py-2 pr-4 pl-3 duration-200 ${isActive? "text-sky-700":"text-grey-700"} border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 
+                                hover:text-sky-700 lg:p-0`
                             }
                         >
                             Home
@@ -49,8 +51,8 @@ function Navbar() {
                         <NavLink
                         to='/Services'
                             className={({isActive}) =>
-                                `block py-2 pr-4 pl-3 duration-200 ${isActive? "text-orange-700":"text-grey-700"} border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 
-                                hover:text-orange-700 lg:p-0`
+                                `block py-2 pr-4 pl-3 duration-200 ${isActive? "text-sky-700":"text-grey-700"} border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 
+                                hover:text-sky-700 lg:p-0`
                             }
                         >
                             Services
