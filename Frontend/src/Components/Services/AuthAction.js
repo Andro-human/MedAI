@@ -28,8 +28,27 @@ const userLogin = async ({role, email, password}) => {
     return data;
 }
 
-const userRegister = async() => {
-  
+const userRegister = async(name,
+  age,
+  email,
+  password,
+  phone,
+  role,
+  gender,
+  specialization,
+  experience,
+  education,) => {
+    try {
+        const {data} = await API.post("/auth/register", {name, age, email, password, phone, role, gender,
+          specialization,
+          experience,
+          education,})
+        if (data.success) {
+            toast.success(data.message)
+            window.location.replace("/login")
+        }   
+
+
 }
 
 export {userAppointment, userLogin, userRegister }

@@ -1,23 +1,18 @@
-import { useState } from 'react'
-import './App.css'
-import Navbar from './Components/Navbar/Navbar'
-import Footer from './Components/Footer/Footer'
+import { useState } from "react";
+import "./App.css";
+import Navbar from "./Components/Navbar/Navbar";
+import Footer from "./Components/Footer/Footer";
 
-import { Outlet } from 'react-router-dom'
-import Contact from './Components/Contact/Contact'
-import AdminDashboard from './Components/AdminDashboard/AdminDashboard'
-
+import { Outlet } from "react-router-dom";
 
 function App() {
- 
-
   return (
     <>
-    <Navbar/>
-    <Outlet/>
-    <Footer/>
+      <Navbar />
+      <Outlet />
+      <Footer />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
