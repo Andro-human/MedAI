@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-  createAppointmentControler,
+  createAppointmentController,
   getAppointmentController,
   getDoctorController,
   getAllUsers,
@@ -11,7 +11,7 @@ const authMiddleware = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
-router.post("/create-appointment", authMiddleware, createAppointmentControler);
+router.post("/create-appointment", authMiddleware, createAppointmentController);
 router.get("/get-appointment", authMiddleware, getAppointmentController)
 router.post("/get-doctor", authMiddleware, getDoctorController)
 

@@ -1,16 +1,48 @@
 const appointmentModel = require("../models/appointmentModel");
 const userModel = require("../models/userModel");
 
-const createAppointmentControler = async (req, res) => {
+const createAppointmentController = async (req, res) => {
   try {
+    const { doctor, userId, timeslot } = req.body;
+    // Fetch doctor and patient from the userModel
+    const doctorData = await userModel.findById(doctor);
+    const patientData = await userModel.findById(userId);
+    
+    console.log("doctor, userId, timeslot", doctor, userId, timeslot);
+    // Check if doctor and patient exist
+    if (!doctorData || !patientData) {
+      return res.status(404).send({
+        success: false,
+        message: "Doctor or patient not found",
+      });
+    }
+
+    // Role validation
+    if (doctorData.role !== "doctor") {
+      return res.status(400).send({
+        success: false,
+        message: "The selected user is not a doctor",
+      });
+    }
+
+    if (patientData.role !== "user") {
+      return res.status(400).send({
+        success: false,
+        message: "The selected user is not a patient",
+      });
+    }
+
+    // Check for existing appointments
     const existingAppointmentOfDoctor = await appointmentModel.findOne({
-      doctor: req.body.doctor,
-      timeSlot: req.body.timeSlot,
+      doctor,
+      timeslot,
     });
+
     const existingAppointmentOfUser = await appointmentModel.findOne({
-      patient: req.body.userId,
-      timeslot: req.body.timeslot,
+      patient: userId,
+      timeslot,
     });
+
     if (existingAppointmentOfDoctor) {
       return res.status(409).send({
         success: false,
@@ -25,8 +57,15 @@ const createAppointmentControler = async (req, res) => {
       });
     }
 
-    const appointment = new appointmentModel(req.body);
+    // Create and save the appointment
+    const appointment = new appointmentModel({
+      doctor,
+      patient: userId,
+      date: timeslot,
+    });
+
     await appointment.save();
+
     return res.status(201).send({
       success: true,
       message: "New appointment created",
@@ -82,7 +121,7 @@ const getDoctorController = async (req, res) => {
 
     return res.status(200).send({
       success: true,
-      message: "Successfully fetched the available doctos",
+      message: "Successfully fetched the available doctors",
       availableDoctors,
     });
   } catch (error) {
@@ -172,7 +211,7 @@ const getAllAppointments = async (req, res) => {
 };
 
 module.exports = {
-  createAppointmentControler,
+  createAppointmentController,
   getAppointmentController,
   getDoctorController,
   getAllDoctors,
