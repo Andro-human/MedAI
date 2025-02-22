@@ -1,4 +1,3 @@
-import React from 'react'
 import API from './API'
 import { toast } from 'react-toastify';
 
@@ -24,11 +23,12 @@ const userLogin = async ({role, email, password}) => {
         toast.success(data.message);
         if (role === 'user') window.location.replace("/userdashboard")
         if(role === 'doctor') window.location.replace("/doctordashboard")
+        if (role === 'admin') window.location.replace("/admindashboard")
     }
     return data;
 }
 
-const userRegister = async(name,
+const userRegister = async({name,
   age,
   email,
   password,
@@ -37,18 +37,25 @@ const userRegister = async(name,
   gender,
   specialization,
   experience,
-  education,) => {
+  education}) => {
     try {
-        const {data} = await API.post("/auth/register", {name, age, email, password, phone, role, gender,
-          specialization,
-          experience,
-          education,})
+        console.log("registering");
+        console.log(name
+          , age
+          , email
+          , password
+          , phone
+          , role
+          , specialization, experience, education);
+        const {data} = await API.post("/auth/register", {name, age, email, password, phone, role, gender, specialization, experience, education
+        })
         if (data.success) {
             toast.success(data.message)
             window.location.replace("/login")
-        }   
-
-
+        }
+    } catch (error) {
+        console.log(error)
+    }   
 }
 
 export {userAppointment, userLogin, userRegister }

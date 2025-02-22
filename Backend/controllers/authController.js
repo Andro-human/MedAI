@@ -5,21 +5,72 @@ const userModel = require("../models/userModel");
 
 const registerController = async (req, res) => {
   try {
-    const existingUser = await userModel.findOne({ email: req.body.email });
+    const {
+      name,
+      age,
+      email,
+      password,
+      phone,
+      role,
+      gender,
+      specialization,
+      experience,
+      education,
+    } = req.body;
+    console.log("name, age, email", req.body);
+    // Basic field validation
+    if (!name || !email || !password || !role) {
+      return res.status(400).send({
+        success: false,
+        message: "Name, Email, Password, and Role are required.",
+      });
+    }
 
-    if (existingUser)
+    // Role-based validations
+    if ((role === "user" || role === "doctor") && (!age || !gender || !phone)) {
+      return res.status(400).send({
+        success: false,
+        message: "Age, Gender, and Phone are required for users and doctors.",
+      });
+    }
+
+    if (role === "doctor" && (!specialization || !experience || !education)) {
+      return res.status(400).send({
+        success: false,
+        message: "Specialization, Experience, and Education are required for doctors.",
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) {
       return res.status(409).send({
         success: false,
         message: "User already exists!",
       });
+    }
 
+    // Hash the password
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(req.body.password, salt);
-    req.body.password = hashedPassword;
+    const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Create new user with hashed password
+    const user = new userModel({
+      name,
+      age,
+      email,
+      password: hashedPassword,
+      phone,
+      role,
+      gender,
+      specialization,
+      experience,
+      education,
+    });
 
-    const user = new userModel(req.body);
+    // Save the user
     await user.save();
+
     return res.status(201).send({
       success: true,
       message: "User Registered Successfully",
@@ -29,7 +80,7 @@ const registerController = async (req, res) => {
     res.status(500).send({
       success: false,
       message: "Error in Register API",
-      error,
+      error: error.message,
     });
   }
 };
