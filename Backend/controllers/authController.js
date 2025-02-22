@@ -38,9 +38,6 @@ const loginController = async (req, res) => {
   try {
     // const user = req.body;
     const user = await userModel.findOne({ email: req.body.email });
-    console.log(user.role, user.role.length);
-    console.log("BREAK");
-    console.log(req.body.role, req.body.role.length);
     if (!user)
       return res.status(404).send({
         success: false,
@@ -112,4 +109,28 @@ const getUserController = async (req, res) => {
   }
 };
 
-module.exports = { registerController, loginController, getUserController };
+const deleteController = async (req, res) => {
+  try {
+    const user = await userModel.findById(req.body.userId);
+    if (user?.role !== "admin") {
+      return res.status(401).send({
+        success: false,
+        message: "Unauthorized Access",
+      });
+    }
+    
+    await userModel.findByIdAndDelete(req.params.id);
+    return res.status(200).send({
+      success: true,
+      message: " Record Deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).send({
+      success: false,
+      message: "Error while deleting ",
+      error,
+    });
+  }
+};
+
+module.exports = { registerController, loginController, getUserController, deleteController };
