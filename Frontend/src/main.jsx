@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
@@ -24,6 +23,8 @@ import Userdashboard from "./Components/UserDashboard/Userdashboard.jsx";
 import { Provider } from "react-redux";
 import { CssBaseline } from "@mui/material";
 import store from "./redux/store.js";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -56,5 +57,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <CssBaseline />
     <RouterProvider router={router} />
+    <ToastContainer />
   </Provider>
 );
