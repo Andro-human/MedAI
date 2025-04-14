@@ -7,7 +7,7 @@ const Form = () => {
   const [formData, setFormData] = useState({
     doctorName: "",
     date: "",
-    specialisation:"",
+    specialization: "",
     time: "",
   });
 
@@ -19,18 +19,18 @@ const Form = () => {
     });
   };
 
-  const handleSubmit = (e, date, time, specialisation, doctorName) => {
+  const handleSubmit = (e, date, time, specialization, doctorName) => {
     e.preventDefault();
     // Handle form submission logic here
     // console.log(formData); // For testing
     try {
-      if (!date || !time || !specialisation || !doctorName) {
-          toast.error("Please enter all fields")
-          return;
+      if (!date || !time || !specialization || !doctorName) {
+        toast.error("Please enter all fields");
+        return;
       }
-      userAppointment({date, time, specialisation, doctorName})
+      userAppointment({ date, time, specialization, doctorName });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
 
@@ -82,7 +82,7 @@ const Form = () => {
           </select>
         </div> */}
 
-         <div className="mb-4">
+          <div className="mb-4">
             <label
               htmlFor="date"
               className="block text-sm font-medium text-white"
@@ -119,16 +119,16 @@ const Form = () => {
           </div>
           <div className="mb-4">
             <label
-              htmlFor="specialisation"
+              htmlFor="specialization"
               className="block text-sm font-medium text-white"
             >
-              Specialisation
+              specialization
             </label>
             <input
               type="text"
-              id="specialisation"
-              name="specialisation"
-              value={formData.specialisation}
+              id="specialization"
+              name="specialization"
+              value={formData.specialization}
               onChange={handleChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 focus:ring-blue-500"
               required
@@ -151,7 +151,7 @@ const Form = () => {
               required
             />
           </div>
-          
+
           <div className="mt-6">
             <button
               type="submit"
