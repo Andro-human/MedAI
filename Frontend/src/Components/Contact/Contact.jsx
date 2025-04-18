@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import first from "../../assets/first.png";
 import second from "../../assets/third.jpg";
-import third from "../../assets/fourth.jpg";
+import third from "../../assets/saniya.png";
 import simran from "../../assets/simran.jpg";
 function Contact() {
   const [formData, setFormData] = useState({

@@ -34,8 +34,8 @@ const Login = () => {
         toast.success(data.message);
         setTimeout(() => {
           if (role === "user") window.location.replace("/userdashboard");
-          if (role === "doctor") window.location.replace("/doctordashboard");
-          if (role === "admin") window.location.replace("/admindashboard");
+          if (role === "doctor") window.location.replace("/doctor-dashboard");
+          if (role === "admin") window.location.replace("/admin-dashboard");
         }, 2000);
       } else {
         toast.error(data.message || "Login failed");
@@ -62,7 +62,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-[80vh] bg-gray-50">
+    <div className="flex flex-col md:flex-row bg-gray-50 h-[92vh]">
       {loading && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -70,7 +70,7 @@ const Login = () => {
       )}
 
       {/* Left side - Image and Welcome text */}
-      <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 bg-gradient-to-br from-blue-50 to-blue-100">
+      <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 bg-gradient-to-br from-blue-50 to-blue-100 ">
         <div className="max-w-md text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
             Welcome to MedAI
@@ -83,7 +83,7 @@ const Login = () => {
             <img
               src={medicalIllustration}
               alt="Medical illustration"
-              className="w-3/4 md:w-full max-w-md object-contain"
+              className="w-3/5"
             />
           </div>
         </div>

@@ -305,7 +305,7 @@ function Chat() {
   };
 
   const renderConversationList = () => (
-    <div className="w-full md:w-1/3 bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+    <div className="w-full md:w-1/3 bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 h-[85vh]">
       <div className="p-4 border-b border-gray-200">
         <h2 className="text-xl font-semibold text-gray-800">Messages</h2>
         <p className="text-sm text-gray-500">Your doctor conversations</p>
@@ -372,7 +372,7 @@ function Chat() {
   );
 
   const renderChatWindow = () => (
-    <div className="w-full md:w-2/3 bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 flex flex-col">
+    <div className="w-full md:w-2/3 bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 flex flex-col h-[85vh]">
       {selectedConversation ? (
         <>
           <div className="p-4 border-b border-gray-200 flex justify-between items-center">
@@ -515,15 +515,8 @@ function Chat() {
   );
 
   return (
-    <div className="bg-gray-50 min-h-[75vh] p-1">
-      {/* <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Chat</h1>
-        <p className="text-gray-600">
-          Message your healthcare providers about your appointments
-        </p>
-      </div> */}
-
-      <div className="flex flex-col md:flex-row gap-1">
+    <div className="bg-gray-50 h-[92vh] p-4 md:p-6">
+      <div className="flex flex-col md:flex-row gap-4">
         {renderConversationList()}
         {renderChatWindow()}
       </div>

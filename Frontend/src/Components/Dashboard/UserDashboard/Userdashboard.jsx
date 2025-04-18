@@ -8,6 +8,10 @@ import {
   FaCalendarAlt,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { confirmAlert } from 'react-confirm-alert'; 
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import RescheduleModal from "../Appointments/RescheduleModal";
 
 function Userdashboard() {
   const { user } = useSelector((state) => state.auth);
@@ -15,6 +19,29 @@ function Userdashboard() {
   const [doctorMap, setDoctorMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("upcoming");
+  const navigate = useNavigate();
+  const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+
+  const formatTimeTo12Hour = (time) => {
+    if (!time) return "";
+    
+    if (time.includes('AM') || time.includes('PM')) {
+      return time;
+    }
+    
+    const timeParts = time.split(':');
+    let hours = parseInt(timeParts[0], 10);
+    const minutes = timeParts[1];
+    
+    // Determine AM/PM and convert hours
+    const period = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // Convert 0 to 12 for 12 AM
+    
+    // Format with leading zero for minutes
+    return `${hours}:${minutes} ${period}`;
+  };
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -34,7 +61,7 @@ function Userdashboard() {
 
           // Create a map of doctor IDs to doctor data for easy access
           const doctorsById = {};
-          if (data.doctors && Array.isArray(data.doctors)) {
+          if (data.doctors && Array.isArray(data.doctor)) {
             data.doctors.forEach((doctor) => {
               doctorsById[doctor._id] = doctor;
             });
@@ -56,17 +83,14 @@ function Userdashboard() {
 
   // Process appointment data to include doctor information
   const processedAppointments = appointments.map((appointment) => {
-    const doctor = doctorMap[appointment.doctor] || {};
+    const doctor = appointment.doctor || {};
     return {
       ...appointment,
       doctorName: doctor.name || "Unknown Doctor",
       specialization:
         doctor.specialization || doctor.specialization || "General",
-      time: new Date(appointment.date).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      status: appointment.status || "scheduled",
+      date: appointment.date,
+      time: formatTimeTo12Hour(appointment.timeslot),
     };
   });
 
@@ -89,15 +113,58 @@ function Userdashboard() {
         return "bg-green-100 text-green-800 border-green-200";
       case "scheduled":
         return "bg-blue-100 text-blue-800 border-blue-200";
-      case "cancelled":
-        return "bg-red-100 text-red-800 border-red-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
     }
+  };
+  
+  const handleReschedule = (appointment) => {
+    setSelectedAppointment(appointment);
+    setIsRescheduleModalOpen(true);
+  };
+
+  const handleDelete = (appointmentId) => {
+    confirmAlert({
+      title: 'Cancel Appointment',
+      message: 'Are you sure you want to cancel this appointment?',
+      buttons: [
+        {
+          label: 'Yes',
+          onClick: async () => {
+            try {
+              const { data } = await axios.post(`${import.meta.env.VITE_SERVER}appointment/cancel-appointment/`, 
+                {
+                  appointmentId,
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                });
+              if (data.success) {
+                toast.success(data.message);
+                window.location.reload();
+              } else {
+                toast.error(data.message);
+              }
+            } catch (error) {
+              console.error(error);
+              toast.error("Failed to cancel appointment");
+            }
+          }
+        },
+        {
+          label: 'No',
+          onClick: () => {}
+        }
+      ]
+    });
+  };
+
+  const handleRescheduleSuccess = () => {
+    window.location.reload();
   };
 
   return (
-    <div className="bg-gray-50 min-h-[80vh] p-4 md:p-6">
+    <div className="bg-gray-50 min-h-[92vh] p-4 md:p-6">
       {/* Welcome Section */}
       <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
@@ -146,7 +213,8 @@ function Userdashboard() {
             <div>
               <p className="text-gray-500 text-sm">Different Doctors</p>
               <h3 className="text-2xl font-bold text-gray-800">
-                {Object.keys(doctorMap).length || 0}
+                {/* Get unique count of doctor IDs from appointments */}
+                {Array.from(new Set(appointments.map(app => app.doctor?._id))).filter(Boolean).length}
               </h3>
             </div>
           </div>
@@ -247,19 +315,24 @@ function Userdashboard() {
                               </div>
                               <span
                                 className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusClass(
-                                  appointment.status
+                                    "scheduled"
                                 )}`}
                               >
-                                {appointment.status.charAt(0).toUpperCase() +
-                                  appointment.status.slice(1)}
+                                Scheduled
                               </span>
                             </div>
                           </div>
                           <div className="mt-4 md:mt-0 flex gap-2">
-                            <button className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm transition-colors">
+                            <button 
+                              onClick={() => handleReschedule(appointment)} 
+                              className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm transition-colors"
+                            >
                               Reschedule
                             </button>
-                            <button className="border border-red-300 hover:bg-red-50 text-red-600 py-2 px-4 rounded-lg text-sm transition-colors">
+                            <button 
+                              onClick={() => handleDelete(appointment._id)} 
+                              className="border border-red-300 hover:bg-red-50 text-red-600 py-2 px-4 rounded-lg text-sm transition-colors"
+                            >
                               Cancel
                             </button>
                           </div>
@@ -315,17 +388,16 @@ function Userdashboard() {
                                 </div>
                                 <span
                                   className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusClass(
-                                    appointment.status
+                                    "completed"
                                   )}`}
                                 >
-                                  {appointment.status.charAt(0).toUpperCase() +
-                                    appointment.status.slice(1)}
+                                  Completed
                                 </span>
                               </div>
                             </div>
                             <div className="mt-4 md:mt-0">
-                              <button className="bg-white border border-blue-500 text-blue-600 py-2 px-4 rounded-lg text-sm transition-colors hover:bg-blue-50">
-                                View Details
+                              <button onClick={() => navigate(`/chat/${appointment.doctor._id}`)} className="bg-white border border-blue-500 text-blue-600 py-2 px-4 rounded-lg text-sm transition-colors hover:bg-blue-50">
+                                Chat with Doctor
                               </button>
                             </div>
                           </div>
@@ -347,6 +419,15 @@ function Userdashboard() {
           )}
         </div>
       </div>
+
+      {isRescheduleModalOpen && (
+        <RescheduleModal
+          isOpen={isRescheduleModalOpen}
+          onClose={() => setIsRescheduleModalOpen(false)}
+          appointment={selectedAppointment}
+          onReschedule={handleRescheduleSuccess}
+        />
+      )}
     </div>
   );
 }

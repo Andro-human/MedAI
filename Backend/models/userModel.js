@@ -47,12 +47,25 @@ const userSchema = new mongoose.Schema(
       },
       min: 10
     },
-    specialisation: {
+    specialization: {
       type: String,
       required: function () {
         if (this.role === "doctor") return true;
         return false;
       },
+      enum: [
+        "General Medicine",
+        "Cardiology",
+        "Dermatology",
+        "Orthopedics",
+        "Neurology",
+        "Pediatrics",
+        "Gynecology",
+        "Ophthalmology",
+        "ENT specialist",
+        "Psychiatry",
+        "Dentistry",
+      ],
     },
 
     education: {

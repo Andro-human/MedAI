@@ -12,7 +12,6 @@ import {
 } from "react-icons/fa";
 
 function BookAppointment() {
-  const { user } = useSelector((state) => state.auth);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [specializations] = useState([
@@ -34,25 +33,8 @@ function BookAppointment() {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [bookingSuccess, setBookingSuccess] = useState(false);
-
-  // Available time slots for the selected date
-  const timeSlots = [
-    "09:00 AM",
-    "09:30 AM",
-    "10:00 AM",
-    "10:30 AM",
-    "11:00 AM",
-    "11:30 AM",
-    "12:00 PM",
-    "12:30 PM",
-    "02:00 PM",
-    "02:30 PM",
-    "03:00 PM",
-    "03:30 PM",
-    "04:00 PM",
-    "04:30 PM",
-    "05:00 PM",
-  ];
+  const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
+  const [fetchingTimeSlots, setFetchingTimeSlots] = useState(false);
 
   // Fetch doctors by specialization
   const fetchDoctors = async (specialization) => {
@@ -81,6 +63,7 @@ function BookAppointment() {
     }
   };
 
+  console.log(doctors);
   // Handle specialization selection
   const handleSpecializationSelect = (specialization) => {
     setSelectedSpecialization(specialization);
@@ -91,12 +74,23 @@ function BookAppointment() {
   // Handle doctor selection
   const handleDoctorSelect = (doctor) => {
     setSelectedDoctor(doctor);
+    
+    if (selectedDate) {
+      fetchAvailableTimeSlots(doctor._id, selectedDate);
+    }
+    
     setStep(3);
   };
 
   // Handle date selection
-  const handleDateChange = (e) => {
-    setSelectedDate(e.target.value);
+  const handleDateChange = async (e) => {
+    const date = e.target.value;
+    setSelectedDate(date);
+    setSelectedTime("");
+    
+    if (date && selectedDoctor) {
+      await fetchAvailableTimeSlots(selectedDoctor._id, date);
+    }
   };
 
   // Handle time selection
@@ -127,25 +121,15 @@ function BookAppointment() {
     try {
       setLoading(true);
 
-      // Combine date and time for appointment
-      const timeString = selectedTime.replace(
-        /(\d+):(\d+) (AM|PM)/,
-        (match, hour, minute, period) => {
-          let hours = parseInt(hour);
-          if (period === "PM" && hours < 12) hours += 12;
-          if (period === "AM" && hours === 12) hours = 0;
-          return `${hours.toString().padStart(2, "0")}:${minute}:00`;
-        }
-      );
-
-      const appointmentDateTime = new Date(`${selectedDate}T${timeString}`);
-
+      // Parse the time properly
+      // console.log("selectedTime", selectedTime);
+      
       const { data } = await axios.post(
         `${import.meta.env.VITE_SERVER}appointment/create-appointment`,
         {
           doctor: selectedDoctor._id,
-          date: appointmentDateTime,
-          patient: user._id,
+          date: selectedDate,
+          time: selectedTime,
         },
         {
           headers: {
@@ -178,12 +162,67 @@ function BookAppointment() {
     setStep(1);
   };
 
+  // Add new function to fetch available time slots
+  const fetchAvailableTimeSlots = async (doctorId, date) => {
+    try {
+      setFetchingTimeSlots(true);
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_SERVER}appointment/get-available-timeslots`,
+        { 
+          doctorId,
+          date 
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      console.log("timeslots", data);
+      if (data.success) {
+        setAvailableTimeSlots(data.availableTimeslots || []);
+      } else {
+        toast.error(data.message || "Failed to fetch available time slots");
+        setAvailableTimeSlots([]);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error fetching available time slots");
+      setAvailableTimeSlots([]);
+    } finally {
+      setFetchingTimeSlots(false);
+    }
+  };
+
+  // Add this function after your existing functions
+  const formatTimeTo12Hour = (time) => {
+    if (!time) return "";
+    
+    // If the time is already in 12-hour format, return it as is
+    if (time.includes('AM') || time.includes('PM')) {
+      return time;
+    }
+    
+    // Parse the time (assuming format is HH:MM or HH:MM:SS)
+    const timeParts = time.split(':');
+    let hours = parseInt(timeParts[0], 10);
+    const minutes = timeParts[1];
+    
+    // Determine AM/PM and convert hours
+    const period = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // Convert 0 to 12 for 12 AM
+    
+    // Format with leading zero for minutes
+    return `${hours}:${minutes} ${period}`;
+  };
+
   // Render the appointment booking steps
   const renderSteps = () => {
     switch (step) {
       case 1:
         return (
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-xl shadow-sm p-6 ">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Select a Specialization
             </h2>
@@ -340,21 +379,31 @@ function BookAppointment() {
                   </div>
                 </label>
                 {selectedDate ? (
-                  <div className="grid grid-cols-3 gap-2 mt-2">
-                    {timeSlots.map((time) => (
-                      <div
-                        key={time}
-                        className={`text-center py-2 px-1 rounded-lg text-sm cursor-pointer border ${
-                          selectedTime === time
-                            ? "bg-blue-500 text-white border-blue-500"
-                            : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"
-                        }`}
-                        onClick={() => handleTimeSelect(time)}
-                      >
-                        {time}
-                      </div>
-                    ))}
-                  </div>
+                  fetchingTimeSlots ? (
+                    <div className="flex justify-center items-center h-40">
+                      <div className="w-8 h-8 border-4 border-blue-400 border-t-blue-600 rounded-full animate-spin"></div>
+                    </div>
+                  ) : availableTimeSlots.length > 0 ? (
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                      {availableTimeSlots.map((time) => (
+                        <div
+                          key={time}
+                          className={`text-center py-2 px-1 rounded-lg text-sm cursor-pointer border ${
+                            selectedTime === time
+                              ? "bg-blue-500 text-white border-blue-500"
+                              : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"
+                          }`}
+                          onClick={() => handleTimeSelect(time)}
+                        >
+                          {formatTimeTo12Hour(time)}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 border border-gray-200 rounded-lg">
+                      <p className="text-gray-500">No available time slots for this date</p>
+                    </div>
+                  )
                 ) : (
                   <div className="text-center py-4 border border-gray-200 rounded-lg">
                     <p className="text-gray-500">Please select a date first</p>
@@ -388,9 +437,9 @@ function BookAppointment() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-[80vh] p-4 md:p-6">
+    <div className="bg-gray-50 min-h-[92vh] p-4 md:p-6">
       {bookingSuccess ? (
-        <div className="bg-white rounded-xl shadow-sm p-8 text-center">
+        <div className="bg-white rounded-xl shadow-sm p-8 text-center h-[80vh] flex flex-col justify-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -412,7 +461,7 @@ function BookAppointment() {
           </h2>
           <p className="text-gray-600 mb-6">
             Your appointment with Dr. {selectedDoctor?.name} is scheduled for{" "}
-            {selectedDate} at {selectedTime}.
+            {selectedDate} at {formatTimeTo12Hour(selectedTime)}.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button

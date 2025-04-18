@@ -2,11 +2,11 @@ import "./App.css";
 import Navbar from "./Components/Navbar/Navbar";
 import Footer from "./Components/Footer/Footer";
 import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
-import Herosection from "./Components/Herosection/Herosection";
+import Herosection from "./pages/Herosection.jsx";
 import Services from "./Components/Services/Services";
 import Form from "./Components/Form/Form";
-import Login from "./Components/Login/Login";
-import Signup from "./Components/Signup/Signup";
+import Login from "./pages/Auth/Login.jsx";
+import Signup from "./pages/Auth/Signup.jsx";
 import Contact from "./Components/Contact/Contact";
 import { useSelector, useDispatch } from "react-redux";
 import { userExists, userNotExists } from "./redux/reducers/auth";
@@ -25,6 +25,8 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BookAppointment from "./Components/Dashboard/Appointments/BookAppointment.jsx";
 import Chat from "./Components/Chat/Chat.jsx";
+import PublicRoutes from "./Components/Routes/PublicRoutes.jsx";
+
 function App() {
   const { user, isLoading } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -55,37 +57,67 @@ function App() {
     <Router>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Herosection />} />
-        <Route path="/Services" element={<Services />} />
+        <Route element={<PublicRoutes user={user} />}>
+          <Route
+            path="/"
+            element={
+              <>
+                <Herosection />
+                <Footer />
+              </>
+            }
+          />
+          <Route path="/Login" element={<Login />} />
+          <Route path="/Signup" element={<Signup />} />
+        </Route>
+
         <Route
+          path="/Services"
+          element={
+            <>
+              <Services />
+              <Footer />
+            </>
+          }
+        />
+        <Route
+          path="/Contact"
+          element={
+            <>
+              <Contact />
+              <Footer />
+            </>
+          }
+        />
+        {/* <Route
           path="/appointment"
           element={
             <ProtectedRoutes user={user}>
               <Form />
             </ProtectedRoutes>
           }
-        />
-        <Route path="/Login" element={<Login />} />
-        <Route path="/Signup" element={<Signup />} />
-        <Route path="/Contact" element={<Contact />} />
+        /> */}
+
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/doctors" element={<Doctors />} />
-        <Route path="/patients" element={<Patients />} />
-        <Route
-          path="/appointments"
-          element={
-            <ProtectedRoutes user={user} redirect="/">
-              <Appointments />
-            </ProtectedRoutes>
-          }
-        />
-        <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
-        <Route path="/userdashboard" element={<Userdashboard />} />
-        <Route path="/bookAppointment" element={<BookAppointment />} />
-        <Route path="/chat" element={<Chat />} />
+        <Route element={<ProtectedRoutes user={user} />}>
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/doctors" element={<Doctors />} />
+          <Route path="/patients" element={<Patients />} />
+          <Route
+            path="/appointments"
+            element={
+              <ProtectedRoutes user={user} redirect="/">
+                <Appointments />
+              </ProtectedRoutes>
+            }
+          />
+          <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+          <Route path="/userdashboard" element={<Userdashboard />} />
+          <Route path="/bookAppointment" element={<BookAppointment />} />
+          <Route path="/chat" element={<Chat />} />
+        </Route>
       </Routes>
-      <Footer />
+
       <ToastContainer />
     </Router>
   );

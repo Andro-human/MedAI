@@ -22,6 +22,20 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
+  const specializations = [
+    "General Medicine",
+    "Cardiology",
+    "Dermatology",
+    "Orthopedics",
+    "Neurology",
+    "Pediatrics",
+    "Gynecology",
+    "Ophthalmology",
+    "ENT specialist",
+    "Psychiatry",
+    "Dentistry",
+  ];
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -41,7 +55,47 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate form data
+    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    
+    if (formData.password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+    
+    if (parseInt(formData.age) < 1 || parseInt(formData.age) > 120) {
+      toast.error("Age must be between 1 and 120");
+      return;
+    }
+    
+    if (!/^\d{10}$/.test(formData.phone)) {
+      toast.error("Please enter a valid 10-digit phone number");
+      return;
+    }
+    
+    if (formData.role === "doctor") {
+      if (!formData.specialization) {
+        toast.error("Please select your specialization");
+        return;
+      }
+      
+      if (parseInt(formData.experience) < 0 || parseInt(formData.experience) > 50) {
+        toast.error("Experience must be between 0 and 50 years");
+        return;
+      }
+      
+      if (formData.education.length < 2) {
+        toast.error("Please enter valid education qualification");
+        return;
+      }
+    }
+    
     setLoading(true);
+    
     console.log(formData);
     try {
       const { data } = await axios.post(
@@ -137,10 +191,17 @@ const Signup = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full bg-white bg-opacity-80 rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full bg-white bg-opacity-80 rounded-lg border ${
+                  formData.email && !/\S+@\S+\.\S+/.test(formData.email) 
+                    ? "border-red-500" 
+                    : "border-gray-300"
+                } p-3 focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 placeholder="Enter your email"
                 required
               />
+              {formData.email && !/\S+@\S+\.\S+/.test(formData.email) && (
+                <p className="text-red-500 text-sm mt-1">Please enter a valid email address</p>
+              )}
             </div>
 
             <div className="mb-4">
@@ -156,10 +217,17 @@ const Signup = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full bg-white bg-opacity-80 rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full bg-white bg-opacity-80 rounded-lg border ${
+                  formData.password && formData.password.length < 6 
+                    ? "border-red-500" 
+                    : "border-gray-300"
+                } p-3 focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 placeholder="Create a strong password"
                 required
               />
+              {formData.password && formData.password.length < 6 && (
+                <p className="text-red-500 text-sm mt-1">Password must be at least 6 characters</p>
+              )}
             </div>
 
             <div className="flex justify-end mt-6">
@@ -197,12 +265,21 @@ const Signup = () => {
                 type="number"
                 id="age"
                 name="age"
+                min="1"
+                max="120"
                 value={formData.age}
                 onChange={handleChange}
-                className="w-full bg-white bg-opacity-80 rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full bg-white bg-opacity-80 rounded-lg border ${
+                  formData.age && (parseInt(formData.age) < 1 || parseInt(formData.age) > 120) 
+                    ? "border-red-500" 
+                    : "border-gray-300"
+                } p-3 focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 placeholder="Enter your age"
                 required
               />
+              {formData.age && (parseInt(formData.age) < 1 || parseInt(formData.age) > 120) && (
+                <p className="text-red-500 text-sm mt-1">Age must be between 1 and 120</p>
+              )}
             </div>
 
             <div className="mb-4">
@@ -248,10 +325,17 @@ const Signup = () => {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full bg-white bg-opacity-80 rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter your phone number"
+                className={`w-full bg-white bg-opacity-80 rounded-lg border ${
+                  formData.phone && !/^\d{10}$/.test(formData.phone) 
+                    ? "border-red-500" 
+                    : "border-gray-300"
+                } p-3 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                placeholder="Enter your 10-digit phone number"
                 required
               />
+              {formData.phone && !/^\d{10}$/.test(formData.phone) && (
+                <p className="text-red-500 text-sm mt-1">Please enter a valid 10-digit phone number</p>
+              )}
             </div>
 
             {formData.role === "doctor" && (
@@ -267,16 +351,21 @@ const Signup = () => {
                   >
                     Specialization
                   </label>
-                  <input
-                    type="text"
-                    id="specialization"
+                  <select
                     name="specialization"
+                    id="specialization"
                     value={formData.specialization}
                     onChange={handleChange}
                     className="w-full bg-white bg-opacity-80 rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="E.g., Cardiology, Neurology, etc."
                     required={formData.role === "doctor"}
-                  />
+                  >
+                    <option value="">Select your specialization</option>
+                    {specializations.map((spec, index) => (
+                      <option key={index} value={spec}>
+                        {spec}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="mb-4">
@@ -290,12 +379,17 @@ const Signup = () => {
                     type="number"
                     id="experience"
                     name="experience"
+                    min="0"
+                    max="50"
                     value={formData.experience}
                     onChange={handleChange}
                     className="w-full bg-white bg-opacity-80 rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter years of experience"
                     required={formData.role === "doctor"}
                   />
+                  {formData.experience && (parseInt(formData.experience) < 0 || parseInt(formData.experience) > 50) && (
+                    <p className="text-red-500 text-sm mt-1">Experience must be between 0 and 50 years</p>
+                  )}
                 </div>
 
                 <div className="mb-4">
@@ -315,6 +409,9 @@ const Signup = () => {
                     placeholder="E.g., MD, MBBS, etc."
                     required={formData.role === "doctor"}
                   />
+                  {formData.education && formData.education.length < 2 && (
+                    <p className="text-red-500 text-sm mt-1">Please enter valid education qualification</p>
+                  )}
                 </div>
               </>
             )}
@@ -366,9 +463,11 @@ const Signup = () => {
         backgroundSize: `cover`,
         backgroundPosition: "center",
       }}
-      className="min-h-[80vh] flex items-center justify-end p-4 md:p-10 lg:pr-20"
+      className={` flex items-center justify-end p-4 md:p-10 lg:pr-20 ${
+        step === 2 && formData?.role === "doctor"
+      } ? h-[80vh]: h-[92vh]`}
     >
-      <div className="w-full md:w-2/3 lg:w-1/2 xl:w-2/5 backdrop-blur-sm bg-white bg-opacity-50 shadow-xl rounded-2xl p-8 transition-all">
+      <div className="w-full md:w-2/3 lg:w-1/2 xl:w-2/5 backdrop-blur-sm bg-white bg-opacity-50 shadow-xl rounded-2xl p-8 transition-all my-8">
         <div className="flex items-center mb-6">
           <div className="relative w-full">
             <div className="h-1 bg-gray-300 rounded-full w-full absolute top-1/2 transform -translate-y-1/2"></div>
@@ -400,7 +499,7 @@ const Signup = () => {
           </div>
         </div>
 
-        <form>{renderStep()}</form>
+        <form className="max-h-[70vh] overflow-y-auto pr-2">{renderStep()}</form>
       </div>
     </div>
   );
