@@ -1,10 +1,11 @@
+// import { useDispatch } from 'react-redux';
 import API from './API'
 import { toast } from 'react-toastify';
 
-const userAppointment = async (date, time, specialisation, doctorName) => {
+const userAppointment = async (date, time, specialization, doctorName) => {
   try {
     const { data } = await API.post("/auth/create-appointment", {
-      date, time, specialisation, doctorName
+      date, time, specialization, doctorName
     });
 
     if (data.success) {
@@ -19,26 +20,9 @@ const userAppointment = async (date, time, specialisation, doctorName) => {
   }
 };
 
-const userLogin = async ({ role, email, password }) => {
-  try {
-    const { data } = await API.post("auth/login", { role, email, password });
-    console.log(data);
-
-    if (data.success) {
-      localStorage.setItem('token', data.token);
-      toast.success(data.message);
-      
-      if (role === 'user') window.location.replace("/userdashboard");
-      if (role === 'doctor') window.location.replace("/doctordashboard");
-    } else {
-      toast.error(data.message || "Login failed");
-    }
-
-  } catch (error) {
-    console.error(error);
-    toast.error(error.response?.data?.message || "Error while logging in");
-  }
-};
+// const userLogin = async ({ role, email, password }) => {
+  
+// };
 
 const userRegister = async (
   name, age, email, password, phone, role, gender, specialization, experience, education
@@ -61,4 +45,4 @@ const userRegister = async (
   }
 };
 
-export { userAppointment, userLogin, userRegister };
+export { userAppointment, userRegister };
