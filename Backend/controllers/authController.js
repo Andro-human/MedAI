@@ -37,7 +37,8 @@ const registerController = async (req, res) => {
     if (role === "doctor" && (!specialization || !experience || !education)) {
       return res.status(400).send({
         success: false,
-        message: "Specialization, Experience, and Education are required for doctors.",
+        message:
+          "Specialization, Experience, and Education are required for doctors.",
       });
     }
 
@@ -54,20 +55,32 @@ const registerController = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user with hashed password
-    const user = new userModel({
+    // Create base user object with common fields
+    const userData = {
       name,
-      age,
       email,
       password: hashedPassword,
-      phone,
       role,
-      gender,
-      specialization,
-      experience,
-      education,
-    });
+    };
 
+    // Add role-specific fields
+    if (role === "user" || role === "doctor") {
+      userData.age = age;
+      userData.gender = gender;
+      userData.phone = phone;
+    }
+
+    // Add doctor-specific fields only if role is doctor
+    if (role === "doctor") {
+      userData.specialization = specialization;
+      userData.experience = experience;
+      userData.education = education;
+    }
+
+    // Create new user with appropriate fields
+    const user = new userModel(userData);
+
+    console.log("user", user);
     // Save the user
     await user.save();
 
@@ -78,9 +91,10 @@ const registerController = async (req, res) => {
       success: true,
       message: "User Registered Successfully",
       user,
-      token
+      token,
     });
   } catch (error) {
+    console.log("Register error:", error);
     res.status(500).send({
       success: false,
       message: "Error in Register API",
@@ -173,7 +187,7 @@ const deleteController = async (req, res) => {
         message: "Unauthorized Access",
       });
     }
-    
+
     await userModel.findByIdAndDelete(req.params.id);
     return res.status(200).send({
       success: true,
@@ -188,4 +202,9 @@ const deleteController = async (req, res) => {
   }
 };
 
-module.exports = { registerController, loginController, getUserController, deleteController };
+module.exports = {
+  registerController,
+  loginController,
+  getUserController,
+  deleteController,
+};

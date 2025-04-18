@@ -191,7 +191,7 @@ const getPatientAppointmentController = async (req, res) => {
       .find({
         patient: req.body.userId,
       })
-      .populate("doctor", "name specialization email phone");
+      .populate("doctor", "name specialization age gender");
 
     return res.status(200).send({
       success: true,
@@ -210,12 +210,11 @@ const getPatientAppointmentController = async (req, res) => {
 
 const getDoctorAppointmentController = async (req, res) => {
   try {
-    // Find appointments for the doctor with populated patient information
     const appointments = await appointmentModel
       .find({
         doctor: req.body.userId,
       })
-      .populate("patient", "name email phone age gender");
+      .populate("patient", "name age gender");
 
     return res.status(200).send({
       success: true,
@@ -376,7 +375,10 @@ const cancelAppointmentController = async (req, res) => {
     }
 
     // Verify that the user is the patient who booked the appointment
-    if (appointment.patient.toString() !== userId) {
+    if (
+      appointment.patient.toString() !== userId &&
+      appointment.doctor.toString() !== userId
+    ) {
       return res.status(403).send({
         success: false,
         message: "You are not authorized to cancel this appointment",
@@ -426,7 +428,10 @@ const rescheduleAppointmentController = async (req, res) => {
     }
 
     // Verify that the user is the patient who booked the appointment
-    if (appointment.patient.toString() !== userId) {
+    if (
+      appointment.patient.toString() !== userId &&
+      appointment.doctor.toString() !== userId
+    ) {
       return res.status(403).send({
         success: false,
         message: "You are not authorized to reschedule this appointment",
