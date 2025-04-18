@@ -1,7 +1,7 @@
 import React from "react";
-import wound from "../../assets/wound.png";
-import disease from "../../assets/disease.jpg";
-import Report from "../../assets/Report.png";
+import wound from "../assets/Services/wound.png";
+import disease from "../assets/Services/disease.jpg";
+import Report from "../assets/Services/Report.png";
 import { Link } from "react-router-dom";
 function Services() {
   return (

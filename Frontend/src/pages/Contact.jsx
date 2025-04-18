@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import first from "../../assets/first.png";
-import second from "../../assets/third.jpg";
-import third from "../../assets/saniya.png";
-import simran from "../../assets/simran.jpg";
+import first from "../assets/Contact/Ansh.png";
+import second from "../assets/Contact/Animesh.jpg";
+import third from "../assets/Contact/Saniya.png";
+import simran from "../assets/Contact/Anjali.jpg";
 function Contact() {
   const [formData, setFormData] = useState({
     name: "",

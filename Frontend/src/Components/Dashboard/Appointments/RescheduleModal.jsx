@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { FaCalendarAlt, FaClock, FaTimes } from "react-icons/fa";
-
+import { useSelector } from "react-redux";
 const RescheduleModal = ({ isOpen, onClose, appointment, onReschedule }) => {
+  const user = useSelector((state) => state.user);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
@@ -25,8 +26,8 @@ const RescheduleModal = ({ isOpen, onClose, appointment, onReschedule }) => {
     setSelectedDate(date);
     setSelectedTime("");
     
-    if (date && appointment?.doctor?._id) {
-      await fetchAvailableTimeSlots(appointment.doctor._id, date);
+    if (date) {
+      await fetchAvailableTimeSlots(date);
     }
   };
 
@@ -36,7 +37,8 @@ const RescheduleModal = ({ isOpen, onClose, appointment, onReschedule }) => {
   };
 
   // Fetch available time slots
-  const fetchAvailableTimeSlots = async (doctorId, date) => {
+  const fetchAvailableTimeSlots = async (date) => {
+    const doctorId = user?.role === "user" ? appointment?.doctor?._id : appointment?.doctor;
     try {
       setFetchingTimeSlots(true);
       const { data } = await axios.post(
@@ -157,7 +159,7 @@ const RescheduleModal = ({ isOpen, onClose, appointment, onReschedule }) => {
 
         <div className="mb-6">
           <div className="flex items-center mb-2">
-            <h3 className="font-medium">Dr. {appointment?.doctorName}</h3>
+            <h3 className="font-medium">{user?.role === "user" ? "Dr. " + appointment?.doctorName : "Patient. " + appointment?.patientName}</h3>
           </div>
           <p className="text-sm text-gray-600">
             Current appointment: {new Date(appointment?.date).toLocaleDateString()} at {appointment?.time}

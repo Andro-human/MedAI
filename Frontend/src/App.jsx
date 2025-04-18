@@ -1,31 +1,25 @@
 import "./App.css";
-import Navbar from "./Components/Navbar/Navbar";
-import Footer from "./Components/Footer/Footer";
+import Navbar from "./Components/Navbar.jsx";
+import Footer from "./Components/Footer.jsx";
 import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
 import Herosection from "./pages/Herosection.jsx";
-import Services from "./Components/Services/Services";
-import Form from "./Components/Form/Form";
+import Services from "./pages/Services.jsx";
 import Login from "./pages/Auth/Login.jsx";
 import Signup from "./pages/Auth/Signup.jsx";
-import Contact from "./Components/Contact/Contact";
+import Contact from "./pages/Contact.jsx";
 import { useSelector, useDispatch } from "react-redux";
 import { userExists, userNotExists } from "./redux/reducers/auth";
 import { useEffect } from "react";
 import axios from "axios";
-// import API from "./Services/API";
-// import Dashboard from "./Components/Dashboard/Dashboard";
 import AdminDashboard from "./Components/AdminDashboard/AdminDashboard.jsx";
-import Doctors from "./Components/Dashboard/Doctors/Doctors.jsx";
-import Patients from "./Components/Dashboard/Patients/Patients.jsx";
-import Appointments from "./Components/Dashboard/Appointments/BookAppointment.jsx";
-import DoctorDashboard from "./Components/DoctorDashboard/DoctorDashboard.jsx";
-import ProtectedRoutes from "./Components/Routes/ProtectedRoutes.jsx";
-import Userdashboard from "./Components/Dashboard/UserDashboard/Userdashboard.jsx";
+import Appointments from "./pages/BookAppointment.jsx";
+import ProtectedRoutes from "./Routes/ProtectedRoutes.jsx";
+import Userdashboard from "./pages/Dashboard/Userdashboard.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import BookAppointment from "./Components/Dashboard/Appointments/BookAppointment.jsx";
+import BookAppointment from "./pages/BookAppointment.jsx";
 import Chat from "./Components/Chat/Chat.jsx";
-import PublicRoutes from "./Components/Routes/PublicRoutes.jsx";
+import PublicRoutes from "./Routes/PublicRoutes.jsx";
 
 function App() {
   const { user, isLoading } = useSelector((state) => state.auth);
@@ -101,8 +95,6 @@ function App() {
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
         <Route element={<ProtectedRoutes user={user} />}>
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/doctors" element={<Doctors />} />
-          <Route path="/patients" element={<Patients />} />
           <Route
             path="/appointments"
             element={
@@ -111,7 +103,7 @@ function App() {
               </ProtectedRoutes>
             }
           />
-          <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+          <Route path="/doctor-dashboard" element={<Userdashboard  />} />
           <Route path="/userdashboard" element={<Userdashboard />} />
           <Route path="/bookAppointment" element={<BookAppointment />} />
           <Route path="/chat" element={<Chat />} />

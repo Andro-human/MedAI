@@ -1,6 +1,5 @@
 import React from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
-import Doctors from '../Dashboard/Doctors/Doctors'
 function AdminDashboard() {
   return (
     <div className='h-screen flex flex--row'>

@@ -5,7 +5,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { FaUser, FaLock, FaUserMd, FaUserCog } from "react-icons/fa";
-import medicalIllustration from "../../assets/sidebar.png";
+import loginImage from "../../assets/Auth/Login.jpg";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -81,9 +81,9 @@ const Login = () => {
           </p>
           <div className="flex justify-center">
             <img
-              src={medicalIllustration}
+              src={loginImage}
               alt="Medical illustration"
-              className="w-3/5"
+              className="rounded-full shadow-lg"
             />
           </div>
         </div>

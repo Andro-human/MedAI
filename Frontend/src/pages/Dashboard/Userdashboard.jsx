@@ -11,12 +11,12 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { confirmAlert } from 'react-confirm-alert'; 
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import RescheduleModal from "../Appointments/RescheduleModal";
+import RescheduleModal from "../../Components/Dashboard/Appointments/RescheduleModal";
 
 function Userdashboard() {
   const { user } = useSelector((state) => state.auth);
   const [appointments, setAppointments] = useState([]);
-  const [doctorMap, setDoctorMap] = useState({});
+  // const [doctorMap, setDoctorMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("upcoming");
   const navigate = useNavigate();
@@ -43,63 +43,81 @@ function Userdashboard() {
     return `${hours}:${minutes} ${period}`;
   };
 
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        setLoading(true);
-        const { data } = await axios.get(
-          `${import.meta.env.VITE_SERVER}appointment/get-patient-appointment`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-
-        if (data.success) {
-          setAppointments(data.appointments);
-
-          // Create a map of doctor IDs to doctor data for easy access
-          const doctorsById = {};
-          if (data.doctors && Array.isArray(data.doctor)) {
-            data.doctors.forEach((doctor) => {
-              doctorsById[doctor._id] = doctor;
-            });
-          }
-          setDoctorMap(doctorsById);
-        }
-      } catch (error) {
-        console.error(error);
-        toast.error("Failed to load appointments");
-      } finally {
-        setLoading(false);
+  const fetchDoctorAppointments = async () => {
+    try {
+      const { data } = await axios.get(`${import.meta.env.VITE_SERVER}appointment/get-doctor-appointment`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      if (data.success) {
+        setAppointments(data.appointments);
       }
-    };
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load appointments");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    if (user?._id) {
+  const fetchAppointments = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_SERVER}appointment/get-patient-appointment`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (data.success) {
+        setAppointments(data.appointments);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load appointments");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user?._id && user?.role === "user") {
       fetchAppointments();
+    }
+    if (user?._id && user?.role === "doctor") {
+      fetchDoctorAppointments();
     }
   }, [user]);
 
   // Process appointment data to include doctor information
-  const processedAppointments = appointments.map((appointment) => {
-    const doctor = appointment.doctor || {};
+  const users = appointments.map((appointment) => {
+    const userDetails = user?.role === "user" ? appointment.doctor : appointment.patient || {};
     return {
       ...appointment,
-      doctorName: doctor.name || "Unknown Doctor",
-      specialization:
-        doctor.specialization || doctor.specialization || "General",
+        ...(user.role === "user" && {
+          doctorName: userDetails.name || "Unknown Doctor",
+          specialization: userDetails.specialization || "General",
+        }),
+        ...(user.role === "doctor" && {
+          patientName: userDetails.name || "Unknown Patient",
+        }),
       date: appointment.date,
       time: formatTimeTo12Hour(appointment.timeslot),
+      age: userDetails.age,
+      gender: userDetails.gender,
     };
   });
 
-  const upcomingAppointments = processedAppointments.filter(
-    (app) => new Date(app.date) >= new Date() && app.status !== "completed"
+  const upcomingAppointments = users.filter(
+    (app) => new Date(app.date) >= new Date()
   );
 
-  const pastAppointments = processedAppointments.filter(
-    (app) => new Date(app.date) < new Date() || app.status === "completed"
+  const pastAppointments = users.filter(
+    (app) => new Date(app.date) < new Date()
   );
 
   const formatDate = (dateString) => {
@@ -171,7 +189,7 @@ function Userdashboard() {
           Welcome back, {user?.name || "Patient"}!
         </h1>
         <p className="text-gray-600 mt-2">
-          Here&apos;s a summary of your medical appointments and health journey
+          {user?.role === "user" ? "Here's a summary of your medical appointments and health journey" : "Here's a summary of your appointments"}
         </p>
       </div>
 
@@ -211,10 +229,10 @@ function Userdashboard() {
               <FaUserMd className="text-purple-600 text-xl" />
             </div>
             <div>
-              <p className="text-gray-500 text-sm">Different Doctors</p>
+              <p className="text-gray-500 text-sm">{user?.role === "user" ? "Different users" : "Different Patients"}</p>
               <h3 className="text-2xl font-bold text-gray-800">
                 {/* Get unique count of doctor IDs from appointments */}
-                {Array.from(new Set(appointments.map(app => app.doctor?._id))).filter(Boolean).length}
+                {Array.from(new Set(appointments.map(app => user?.role === "user" ? app.doctor?._id : app.patient?._id))).filter(Boolean).length}
               </h3>
             </div>
           </div>
@@ -228,7 +246,7 @@ function Userdashboard() {
             <div>
               <p className="text-gray-500 text-sm">Total Appointments</p>
               <h3 className="text-2xl font-bold text-gray-800">
-                {processedAppointments.length}
+                {users.length}
               </h3>
             </div>
           </div>
@@ -273,9 +291,11 @@ function Userdashboard() {
                   {upcomingAppointments.length === 0 ? (
                     <div className="text-center py-8">
                       <p className="text-gray-500">No upcoming appointments</p>
-                      <button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors">
-                        Book New Appointment
-                      </button>
+                      {user?.role === "user" && (
+                        <button onClick={() => navigate("/bookAppointment")} className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+                          Book New Appointment
+                        </button>
+                      )}
                     </div>
                   ) : (
                     <div className="grid gap-4">
@@ -285,12 +305,23 @@ function Userdashboard() {
                           className="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow duration-200 flex flex-col md:flex-row md:items-center"
                         >
                           <div className="flex-1">
+                            <div className="flex gap-4">
                             <h3 className="font-semibold text-lg text-gray-800">
-                              {appointment.doctorName}
+                              {user?.role === "user" ? appointment.doctorName : appointment.patientName}
                             </h3>
-                            <p className="text-sm text-gray-500">
-                              {appointment.specialization}
+                            <p className="text-sm text-gray-700 mt-1">
+                              {appointment.age}
                             </p>
+                            </div>
+                            <div className="flex gap-4">
+                            <p className="text-sm text-gray-500">
+                              {appointment.gender}
+                            </p>
+                            {user?.role === "user" && <p className="text-sm text-gray-500">
+                              {appointment.specialization}
+                            </p>}
+                            </div>
+                            
                             <div className="flex flex-col sm:flex-row sm:items-center gap-y-2 sm:gap-x-4 mt-2 text-gray-600">
                               <div className="flex items-center">
                                 <FaCalendarAlt className="text-blue-500 mr-2" />
@@ -357,13 +388,23 @@ function Userdashboard() {
                           className="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow duration-200"
                         >
                           <div className="flex flex-col md:flex-row md:items-center">
-                            <div className="flex-1">
-                              <h3 className="font-semibold text-lg text-gray-800">
-                                {appointment.doctorName}
-                              </h3>
-                              <p className="text-sm text-gray-500">
-                                {appointment.specialization}
-                              </p>
+                          <div className="flex-1">
+                            <div className="flex gap-4">
+                            <h3 className="font-semibold text-lg text-gray-800">
+                              {user?.role === "user" ? appointment.doctorName : appointment.patientName}
+                            </h3>
+                            <p className="text-sm text-gray-700 mt-1">
+                              {appointment.age}
+                            </p>
+                            </div>
+                            <div className="flex gap-4">
+                            <p className="text-sm text-gray-500">
+                              {appointment.gender}
+                            </p>
+                           {user?.role === "user" && <p className="text-sm text-gray-500">
+                              {appointment.specialization}
+                            </p>}
+                            </div>
                               <div className="flex flex-col sm:flex-row sm:items-center gap-y-2 sm:gap-x-4 mt-2 text-gray-600">
                                 <div className="flex items-center">
                                   <FaCalendarAlt className="text-blue-500 mr-2" />
@@ -396,19 +437,11 @@ function Userdashboard() {
                               </div>
                             </div>
                             <div className="mt-4 md:mt-0">
-                              <button onClick={() => navigate(`/chat/${appointment.doctor._id}`)} className="bg-white border border-blue-500 text-blue-600 py-2 px-4 rounded-lg text-sm transition-colors hover:bg-blue-50">
-                                Chat with Doctor
+                              <button onClick={() => navigate(`/chat/${user?.role === "user" ? appointment.doctor._id : appointment.patient._id}`)} className="bg-white border border-blue-500 text-blue-600 py-2 px-4 rounded-lg text-sm transition-colors hover:bg-blue-50">
+                                Chat with {user?.role === "user" ? "Doctor" : "Patient"}
                               </button>
                             </div>
                           </div>
-                          {appointment.notes && (
-                            <div className="mt-4 bg-gray-50 p-3 rounded-lg">
-                              <p className="text-sm text-gray-700">
-                                <span className="font-semibold">Notes:</span>{" "}
-                                {appointment.notes}
-                              </p>
-                            </div>
-                          )}
                         </div>
                       ))}
                     </div>

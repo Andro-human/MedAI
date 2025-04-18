@@ -1,5 +1,5 @@
 import { useState } from "react";
-import registration from "../../assets/registration.jpg";
+import registration from "../../assets/Auth/registration.jpg";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { userExists } from "../../redux/reducers/auth";

@@ -1,9 +1,8 @@
 import React from "react";
-import logo from "../../assets/logo.png";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import MedAi from "../../assets/MedAi.png";
+import MedAi from "../assets/MedAi.png";
 import { useDispatch, useSelector } from "react-redux";
-import { userNotExists } from "../../redux/reducers/auth";
+import { userNotExists } from "../redux/reducers/auth";
 
 function Navbar() {
   const { user } = useSelector((state) => state.auth);
@@ -87,7 +86,7 @@ function Navbar() {
                 <>
                   <li>
                     <NavLink
-                      to="/doctordashboard"
+                      to="/doctor-dashboard"
                       className={({ isActive }) =>
                         `block py-2 pr-4 pl-3 duration-200 ${
                           isActive ? "text-orange-700" : "text-grey-700"
@@ -109,19 +108,6 @@ function Navbar() {
                       }
                     >
                       Chat
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/appointment"
-                      className={({ isActive }) =>
-                        `block py-2 pr-4 pl-3 duration-200 ${
-                          isActive ? "text-orange-700" : "text-grey-700"
-                        } border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 
-                              hover:text-orange-700 lg:p-0`
-                      }
-                    >
-                      Manage Appointment
                     </NavLink>
                   </li>
                 </>
