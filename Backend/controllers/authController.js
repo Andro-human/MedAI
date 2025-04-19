@@ -17,7 +17,8 @@ const registerController = async (req, res) => {
       experience,
       education,
     } = req.body;
-    console.log("name, age, email", req.body);
+    // console.log("name, age, email", req.body);
+
     // Basic field validation
     if (!name || !email || !password || !role) {
       return res.status(400).send({
@@ -42,6 +43,13 @@ const registerController = async (req, res) => {
       });
     }
 
+    // Validate doctor's age (must be 21 or older)
+    if (role === "doctor" && parseInt(age) < 21) {
+      return res.status(400).send({
+        success: false,
+        message: "Age must be at least 21 for doctors.",
+      });
+    }
     // Check if user already exists
     const existingUser = await userModel.findOne({ email });
     if (existingUser) {
@@ -61,14 +69,12 @@ const registerController = async (req, res) => {
       email,
       password: hashedPassword,
       role,
+      age: parseInt(age),
+      gender,
+      phone,
     };
 
     // Add role-specific fields
-    if (role === "user" || role === "doctor") {
-      userData.age = age;
-      userData.gender = gender;
-      userData.phone = phone;
-    }
 
     // Add doctor-specific fields only if role is doctor
     if (role === "doctor") {
@@ -77,6 +83,8 @@ const registerController = async (req, res) => {
       userData.education = education;
     }
 
+    console.log("userData", userData);
+    console.log("type of age", typeof userData.age);
     // Create new user with appropriate fields
     const user = new userModel(userData);
 

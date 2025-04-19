@@ -13,11 +13,17 @@ const userSchema = new mongoose.Schema(
     },
     age: {
       type: Number,
-      required: function () {
-        if (this.role === "user" || this.role === "doctor") return true;
-        return false;
+      required: true,
+      min: 1,
+      validate: {
+        validator: function (value) {
+          if (this.role === "doctor" && value < 21) {
+            return false;
+          }
+          return true;
+        },
+        message: "Doctors must be at least 21 years old",
       },
-      min: 0,
     },
     gender: {
       type: String,

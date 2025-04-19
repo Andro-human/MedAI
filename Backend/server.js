@@ -14,7 +14,11 @@ connectDB();
 const userSocketIDs = new Map();
 
 const corsOptions = {
-  origin: ["http://localhost:5173", "https://chat-app.animeshsinha.info", "https://chat-app.animeshsinha.dev"],
+  origin: [
+    "http://localhost:5173",
+    "https://chat-app.animeshsinha.info",
+    "https://chat-app.animeshsinha.dev",
+  ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
@@ -23,26 +27,26 @@ const corsOptions = {
 // app.use(cors());
 
 const server = createServer(app, {});
-app.use(
-  cors(corsOptions)
-);// Enable CORS
+app.use(cors(corsOptions)); // Enable CORS
 
 const io = new Server(server, {
   cors: corsOptions,
 });
-app.options('*', cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.set("io", io);
 app.use(express.json());
 app.use(morgan("dev"));
 
-
 app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/appointment", require("./routes/appointmentRoutes"));
 
 io.use((socket, next) => {
-  (socket.request, socket.request.res, async (err) => {
-    await socketAuth(err, socket, next);
-  });
+  socket.request,
+    socket.request.res,
+    async (err) => {
+      await socketAuth(err, socket, next);
+    };
   // next();
 });
 
@@ -50,7 +54,6 @@ io.on("connection", (socket) => {
   const user = socket.user;
   // console.log("A user Connected", user);
   userSocketIDs.set(user._id.toString(), socket.id);
-
 
   io.emit("onlineUsers", { userIDs: Array.from(userSocketIDs.keys()) });
   socket.on("sendMessage", async ({ conversationId, message, members }) => {
