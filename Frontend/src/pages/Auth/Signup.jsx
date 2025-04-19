@@ -67,9 +67,16 @@ const Signup = () => {
       return;
     }
     
-    if (parseInt(formData.age) < 1 || parseInt(formData.age) > 120) {
-      toast.error("Age must be between 1 and 120");
-      return;
+    if (formData.role === "doctor") {
+      if (parseInt(formData.age) < 21 || parseInt(formData.age) > 120) {
+        toast.error("For doctors, age must be between 21 and 120");
+        return;
+      }
+    } else {
+      if (parseInt(formData.age) < 1 || parseInt(formData.age) > 120) {
+        toast.error("Age must be between 1 and 120");
+        return;
+      }
     }
     
     if (!/^\d{10}$/.test(formData.phone)) {
@@ -107,15 +114,6 @@ const Signup = () => {
         localStorage.setItem("token", data.token);
         dispatch(userExists(data.user));
         toast.success(data.message);
-
-        setTimeout(() => {
-          if (formData.role === "user")
-            window.location.replace("/userdashboard");
-          if (formData.role === "doctor")
-            window.location.replace("/doctordashboard");
-          if (formData.role === "admin")
-            window.location.replace("/admindashboard");
-        }, 2000);
       } else {
         toast.error(data.message || "Registration failed");
       }

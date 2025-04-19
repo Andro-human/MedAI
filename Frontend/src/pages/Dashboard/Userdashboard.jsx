@@ -106,7 +106,7 @@ function Userdashboard() {
           patientName: userDetails.name || "Unknown Patient",
         }),
       date: appointment.date,
-      time: formatTimeTo12Hour(appointment.timeslot),
+      timeslot: formatTimeTo12Hour(appointment.timeslot),
       age: userDetails.age,
       gender: userDetails.gender,
     };
@@ -292,7 +292,7 @@ function Userdashboard() {
                     <div className="text-center py-8">
                       <p className="text-gray-500">No upcoming appointments</p>
                       {user?.role === "user" && (
-                        <button onClick={() => navigate("/bookAppointment")} className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+                        <button onClick={() => navigate("/book-appointment")} className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors">
                           Book New Appointment
                         </button>
                       )}
@@ -342,7 +342,7 @@ function Userdashboard() {
                                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                                   />
                                 </svg>
-                                <span>{appointment.time}</span>
+                                <span>{appointment.timeslot}</span>
                               </div>
                               <span
                                 className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusClass(
@@ -425,7 +425,7 @@ function Userdashboard() {
                                       d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                                     />
                                   </svg>
-                                  <span>{appointment.time}</span>
+                                  <span>{appointment.timeslot}</span>
                                 </div>
                                 <span
                                   className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusClass(

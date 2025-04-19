@@ -42,7 +42,7 @@ function Navbar() {
                 <>
                   <li>
                     <NavLink
-                      to="/userdashboard"
+                      to="/dashboard"
                       className={({ isActive }) =>
                         `block py-2 pr-4 pl-3 duration-200 ${
                           isActive ? "text-orange-700" : "text-grey-700"
@@ -68,7 +68,7 @@ function Navbar() {
                   </li>
                   <li>
                     <NavLink
-                      to="/bookAppointment"
+                      to="/book-appointment"
                       className={({ isActive }) =>
                         `block py-2 pr-4 pl-3 duration-200 ${
                           isActive ? "text-orange-700" : "text-grey-700"
@@ -86,7 +86,7 @@ function Navbar() {
                 <>
                   <li>
                     <NavLink
-                      to="/doctor-dashboard"
+                      to="/dashboard"
                       className={({ isActive }) =>
                         `block py-2 pr-4 pl-3 duration-200 ${
                           isActive ? "text-orange-700" : "text-grey-700"
@@ -108,6 +108,63 @@ function Navbar() {
                       }
                     >
                       Chat
+                    </NavLink>
+                  </li>
+                </>
+              )}
+
+              {user?.role == "admin" && (
+                <>
+                  <li>
+                    <NavLink
+                      to="/analytics"
+                      className={({ isActive }) =>
+                        `block py-2 pr-4 pl-3 duration-200 ${
+                          isActive ? "text-orange-700" : "text-grey-700"
+                        } border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 
+                                hover:text-orange-700 lg:p-0`
+                      }
+                    >
+                      Analytics
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/appointments"
+                      className={({ isActive }) =>
+                        `block py-2 pr-4 pl-3 duration-200 ${
+                          isActive ? "text-orange-700" : "text-grey-700"
+                        } border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 
+                                hover:text-orange-700 lg:p-0`
+                      }
+                    >
+                      Appointments
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/doctors"
+                      className={({ isActive }) =>
+                        `block py-2 pr-4 pl-3 duration-200 ${
+                          isActive ? "text-orange-700" : "text-grey-700"
+                        } border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 
+                                hover:text-orange-700 lg:p-0`
+                      }
+                    >
+                      Doctors
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/patients"
+                      className={({ isActive }) =>
+                        `block py-2 pr-4 pl-3 duration-200 ${
+                          isActive ? "text-orange-700" : "text-grey-700"
+                        } border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 
+                                hover:text-orange-700 lg:p-0`
+                      }
+                    >
+                      Patients
                     </NavLink>
                   </li>
                 </>

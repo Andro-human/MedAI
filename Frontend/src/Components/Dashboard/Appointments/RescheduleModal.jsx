@@ -4,13 +4,13 @@ import { toast } from "react-toastify";
 import { FaCalendarAlt, FaClock, FaTimes } from "react-icons/fa";
 import { useSelector } from "react-redux";
 const RescheduleModal = ({ isOpen, onClose, appointment, onReschedule }) => {
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.auth.user);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
   const [fetchingTimeSlots, setFetchingTimeSlots] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  
   useEffect(() => {
     // Reset the form when modal opens
     if (isOpen) {
@@ -159,10 +159,10 @@ const RescheduleModal = ({ isOpen, onClose, appointment, onReschedule }) => {
 
         <div className="mb-6">
           <div className="flex items-center mb-2">
-            <h3 className="font-medium">{user?.role === "user" ? "Dr. " + appointment?.doctorName : "Patient. " + appointment?.patientName}</h3>
+            <h3 className="font-medium">{user?.role === "user" ? "Patient. " + appointment?.doctorName : (user?.role === "doctor" ? "Dr. " + appointment?.patientName : "Patient. " + appointment?.patient?.name)}</h3>
           </div>
           <p className="text-sm text-gray-600">
-            Current appointment: {new Date(appointment?.date).toLocaleDateString()} at {appointment?.time}
+            Current appointment: {new Date(appointment?.date).toLocaleDateString()} at {appointment?.timeslot}
           </p>
         </div>
 

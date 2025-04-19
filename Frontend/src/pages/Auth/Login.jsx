@@ -32,11 +32,6 @@ const Login = () => {
         dispatch(userExists(data.user));
 
         toast.success(data.message);
-        setTimeout(() => {
-          if (role === "user") window.location.replace("/userdashboard");
-          if (role === "doctor") window.location.replace("/doctor-dashboard");
-          if (role === "admin") window.location.replace("/admin-dashboard");
-        }, 2000);
       } else {
         toast.error(data.message || "Login failed");
       }
