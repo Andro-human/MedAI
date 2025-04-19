@@ -1,11 +1,21 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { FaCalendarAlt, FaSearch, FaFilter, FaUserMd, FaUser, FaClock, FaTrash, FaEdit, FaEye } from "react-icons/fa";
-import RescheduleModal from "../../Components/Dashboard/Appointments/RescheduleModal";
-import { confirmAlert } from 'react-confirm-alert';
-import 'react-confirm-alert/src/react-confirm-alert.css';
-import AppointmentDetailsModal from "../../Components/Dashboard/Appointments/AppointmentDetailsModal";
+import {
+  FaCalendarAlt,
+  FaSearch,
+  FaFilter,
+  FaUserMd,
+  FaUser,
+  FaClock,
+  FaTrash,
+  FaEdit,
+  FaEye,
+} from "react-icons/fa";
+import RescheduleModal from "../../Components/Modals/Appointments/RescheduleModal";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
+import AppointmentDetailsModal from "../../Components/Modals/Appointments/AppointmentDetailsModal";
 
 function Appointments() {
   const [appointments, setAppointments] = useState([]);
@@ -59,7 +69,7 @@ function Appointments() {
       const today = new Date();
       return {
         ...app,
-        status:  new Date(app.date) < today ? "completed" : "scheduled",
+        status: new Date(app.date) < today ? "completed" : "scheduled",
       };
     });
 
@@ -82,19 +92,15 @@ function Appointments() {
     if (dateFilter !== "all") {
       const today = new Date();
       const todayStr = today.toISOString().split("T")[0];
-      
+
       if (dateFilter === "today") {
         results = results.filter(
           (app) => new Date(app.date).toISOString().split("T")[0] === todayStr
         );
       } else if (dateFilter === "upcoming") {
-        results = results.filter(
-          (app) => new Date(app.date) > today
-        );
+        results = results.filter((app) => new Date(app.date) > today);
       } else if (dateFilter === "past") {
-        results = results.filter(
-          (app) => new Date(app.date) < today
-        );
+        results = results.filter((app) => new Date(app.date) < today);
       }
     }
 
@@ -103,14 +109,15 @@ function Appointments() {
 
   const handleDelete = (appointmentId) => {
     confirmAlert({
-      title: 'Cancel Appointment',
-      message: 'Are you sure you want to delete this appointment?',
+      title: "Cancel Appointment",
+      message: "Are you sure you want to delete this appointment?",
       buttons: [
         {
-          label: 'Yes',
+          label: "Yes",
           onClick: async () => {
             try {
-              const { data } = await axios.post(`${import.meta.env.VITE_SERVER}appointment/cancel-appointment/`, 
+              const { data } = await axios.post(
+                `${import.meta.env.VITE_SERVER}appointment/cancel-appointment/`,
                 {
                   appointmentId,
                 },
@@ -118,8 +125,9 @@ function Appointments() {
                   headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                   },
-                });
-              
+                }
+              );
+
               if (data.success) {
                 toast.success("Appointment deleted successfully");
                 fetchAppointments();
@@ -130,13 +138,13 @@ function Appointments() {
               console.error("Error deleting appointment:", error);
               toast.error("Error deleting appointment");
             }
-          }
+          },
         },
         {
-          label: 'No',
-          onClick: () => {}
-        }
-      ]
+          label: "No",
+          onClick: () => {},
+        },
+      ],
     });
   };
 
@@ -152,19 +160,19 @@ function Appointments() {
 
   const formatDateTime = (dateStr, timeStr) => {
     const date = new Date(dateStr);
-    const formattedDate = date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    const formattedDate = date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
 
     // Format time to 12-hour format if not already
     let formattedTime = timeStr;
-    if (!timeStr.includes('AM') && !timeStr.includes('PM')) {
-      const timeParts = timeStr.split(':');
+    if (!timeStr.includes("AM") && !timeStr.includes("PM")) {
+      const timeParts = timeStr.split(":");
       let hours = parseInt(timeParts[0], 10);
       const minutes = timeParts[1];
-      const period = hours >= 12 ? 'PM' : 'AM';
+      const period = hours >= 12 ? "PM" : "AM";
       hours = hours % 12 || 12;
       formattedTime = `${hours}:${minutes} ${period}`;
     }
@@ -300,7 +308,10 @@ function Appointments() {
         </div>
       ) : (
         filteredAppointments.map((appointment) => (
-          <div key={appointment._id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div
+            key={appointment._id}
+            className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+          >
             <div className="p-5 border-b">
               <div className="flex justify-between items-start">
                 <div>
@@ -314,7 +325,7 @@ function Appointments() {
                 {getStatusBadge(appointment.status || "scheduled")}
               </div>
             </div>
-            
+
             <div className="px-5 py-3 border-b">
               <div className="flex items-center space-x-3">
                 <div className="flex-shrink-0 h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -330,7 +341,7 @@ function Appointments() {
                 </div>
               </div>
             </div>
-            
+
             <div className="px-5 py-3 border-b">
               <div className="flex items-center">
                 <FaCalendarAlt className="text-blue-500 mr-2" />
@@ -339,7 +350,7 @@ function Appointments() {
                 </span>
               </div>
             </div>
-            
+
             <div className="p-3 flex justify-between items-center bg-gray-50">
               <button
                 onClick={() => setShowDetails(appointment._id)}
@@ -347,7 +358,7 @@ function Appointments() {
               >
                 <FaEye className="mr-1" /> Details
               </button>
-              
+
               <div className="flex space-x-2">
                 <button
                   onClick={() => handleReschedule(appointment)}
@@ -374,8 +385,12 @@ function Appointments() {
   return (
     <div className="bg-gray-50 min-h-[92vh] p-6">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Appointment Management</h1>
-        <p className="text-gray-600">View and manage all appointments in the system</p>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          Appointment Management
+        </h1>
+        <p className="text-gray-600">
+          View and manage all appointments in the system
+        </p>
       </header>
 
       {/* Filters and Search */}
@@ -393,10 +408,13 @@ function Appointments() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
+
           <div className="flex flex-wrap gap-2">
             <div className="flex items-center">
-              <label htmlFor="status-filter" className="mr-2 text-sm font-medium text-gray-700">
+              <label
+                htmlFor="status-filter"
+                className="mr-2 text-sm font-medium text-gray-700"
+              >
                 <FaFilter className="inline mr-1" /> Status:
               </label>
               <select
@@ -411,9 +429,12 @@ function Appointments() {
                 <option value="cancelled">Cancelled</option>
               </select>
             </div>
-            
+
             <div className="flex items-center">
-              <label htmlFor="date-filter" className="mr-2 text-sm font-medium text-gray-700">
+              <label
+                htmlFor="date-filter"
+                className="mr-2 text-sm font-medium text-gray-700"
+              >
                 <FaCalendarAlt className="inline mr-1" /> Date:
               </label>
               <select
@@ -428,37 +449,64 @@ function Appointments() {
                 <option value="past">Past</option>
               </select>
             </div>
-            
+
             <div className="flex items-center space-x-2 ml-2">
               <button
                 onClick={() => setViewMode("table")}
                 className={`p-2 rounded ${
-                  viewMode === "table" ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-600"
+                  viewMode === "table"
+                    ? "bg-blue-100 text-blue-600"
+                    : "bg-gray-100 text-gray-600"
                 }`}
                 title="Table View"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                  />
                 </svg>
               </button>
               <button
                 onClick={() => setViewMode("card")}
                 className={`p-2 rounded ${
-                  viewMode === "card" ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-600"
+                  viewMode === "card"
+                    ? "bg-blue-100 text-blue-600"
+                    : "bg-gray-100 text-gray-600"
                 }`}
                 title="Card View"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                  />
                 </svg>
               </button>
             </div>
           </div>
         </div>
-        
+
         <div className="mt-4 flex justify-between items-center">
           <div className="text-sm text-gray-600">
-            Showing {filteredAppointments.length} out of {appointments.length} appointments
+            Showing {filteredAppointments.length} out of {appointments.length}{" "}
+            appointments
           </div>
           <button
             onClick={fetchAppointments}
@@ -474,15 +522,17 @@ function Appointments() {
         <div className="flex justify-center items-center h-64">
           <div className="w-12 h-12 border-4 border-blue-400 border-t-blue-600 rounded-full animate-spin"></div>
         </div>
+      ) : viewMode === "table" ? (
+        renderTableView()
       ) : (
-        viewMode === "table" ? renderTableView() : renderCardView()
+        renderCardView()
       )}
 
       {/* Appointment Details Modal */}
       <AppointmentDetailsModal
         isOpen={!!showDetails}
         onClose={() => setShowDetails(null)}
-        appointment={appointments.find(a => a._id === showDetails)}
+        appointment={appointments.find((a) => a._id === showDetails)}
         onReschedule={handleReschedule}
         onDelete={handleDelete}
         formatDateTime={formatDateTime}

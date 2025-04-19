@@ -1,10 +1,21 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { FaUser, FaSearch, FaFilter, FaTrash, FaEdit, FaEye, FaPhone, FaEnvelope, FaCalendarAlt, FaVenusMars } from "react-icons/fa";
-import { confirmAlert } from 'react-confirm-alert';
-import 'react-confirm-alert/src/react-confirm-alert.css';
-import EntityDetailsModal from "../../Components/Dashboard/Common/EntityDetailsModal";
+import {
+  FaUser,
+  FaSearch,
+  FaFilter,
+  FaTrash,
+  FaEdit,
+  FaEye,
+  FaPhone,
+  FaEnvelope,
+  FaCalendarAlt,
+  FaVenusMars,
+} from "react-icons/fa";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
+import EntityDetailsModal from "../../Components/Modals/Common/EntityDetailsModal";
 
 function Patients() {
   const [patients, setPatients] = useState([]);
@@ -45,7 +56,7 @@ function Patients() {
     } catch (error) {
       console.error("Error fetching patients:", error);
       toast.error("Error loading patients");
-      
+
       // For development/demo - use dummy data
       const dummyPatients = [
         {
@@ -55,7 +66,7 @@ function Patients() {
           phone: "9876543210",
           age: "32",
           gender: "female",
-          status: "active"
+          status: "active",
         },
         {
           _id: "2",
@@ -64,7 +75,7 @@ function Patients() {
           phone: "9876543211",
           age: "45",
           gender: "male",
-          status: "active"
+          status: "active",
         },
         {
           _id: "3",
@@ -73,8 +84,8 @@ function Patients() {
           phone: "9876543212",
           age: "28",
           gender: "female",
-          status: "inactive"
-        }
+          status: "inactive",
+        },
       ];
       setPatients(dummyPatients);
       setFilteredPatients(dummyPatients);
@@ -107,9 +118,13 @@ function Patients() {
       if (ageFilter === "0-18") {
         results = results.filter((patient) => parseInt(patient.age) <= 18);
       } else if (ageFilter === "19-40") {
-        results = results.filter((patient) => parseInt(patient.age) > 18 && parseInt(patient.age) <= 40);
+        results = results.filter(
+          (patient) => parseInt(patient.age) > 18 && parseInt(patient.age) <= 40
+        );
       } else if (ageFilter === "41-65") {
-        results = results.filter((patient) => parseInt(patient.age) > 40 && parseInt(patient.age) <= 65);
+        results = results.filter(
+          (patient) => parseInt(patient.age) > 40 && parseInt(patient.age) <= 65
+        );
       } else if (ageFilter === "65+") {
         results = results.filter((patient) => parseInt(patient.age) > 65);
       }
@@ -120,22 +135,26 @@ function Patients() {
 
   const handleDelete = (patientId) => {
     confirmAlert({
-      title: 'Delete Patient',
-      message: 'Are you sure you want to delete this patient? All associated records will also be removed.',
+      title: "Delete Patient",
+      message:
+        "Are you sure you want to delete this patient? All associated records will also be removed.",
       buttons: [
         {
-          label: 'Yes',
+          label: "Yes",
           onClick: async () => {
             try {
-              const { data } = await axios.delete(
-                `${import.meta.env.VITE_SERVER}admin/patients/${patientId}`,
+              const { data } = await axios.post(
+                `${import.meta.env.VITE_SERVER}admin/deleteUser`,
+                {
+                  userToBeDeletedId: patientId,
+                },
                 {
                   headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                   },
                 }
               );
-              
+
               if (data.success) {
                 toast.success("Patient deleted successfully");
                 fetchPatients();
@@ -146,38 +165,14 @@ function Patients() {
               console.error("Error deleting patient:", error);
               toast.error("Error deleting patient");
             }
-          }
+          },
         },
         {
-          label: 'No',
-          onClick: () => {}
-        }
-      ]
+          label: "No",
+          onClick: () => {},
+        },
+      ],
     });
-  };
-
-  const handleStatusChange = async (patientId, newStatus) => {
-    try {
-      const { data } = await axios.put(
-        `${import.meta.env.VITE_SERVER}admin/patients/${patientId}/status`,
-        { status: newStatus },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      
-      if (data.success) {
-        toast.success(`Patient ${newStatus === 'active' ? 'activated' : 'deactivated'} successfully`);
-        fetchPatients();
-      } else {
-        toast.error(data.message || "Failed to update patient status");
-      }
-    } catch (error) {
-      console.error("Error updating patient status:", error);
-      toast.error("Error updating patient status");
-    }
   };
 
   const renderTableView = () => (
@@ -232,15 +227,23 @@ function Patients() {
                   <div className="text-sm text-gray-500">{patient.phone}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{patient.age} years</div>
+                  <div className="text-sm text-gray-900">
+                    {patient.age} years
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900 capitalize">{patient.gender}</div>
+                  <div className="text-sm text-gray-900 capitalize">
+                    {patient.gender}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    patient.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                  }`}>
+                  <span
+                    className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      patient.status === "active"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
                     {patient.status || "active"}
                   </span>
                 </td>
@@ -252,13 +255,6 @@ function Patients() {
                       title="View Details"
                     >
                       <FaEye />
-                    </button>
-                    <button
-                      onClick={() => handleStatusChange(patient._id, patient.status === "active" ? "inactive" : "active")}
-                      className={`${patient.status === "active" ? "text-orange-600 hover:text-orange-900" : "text-green-600 hover:text-green-900"} p-1`}
-                      title={patient.status === "active" ? "Deactivate" : "Activate"}
-                    >
-                      <FaEdit />
                     </button>
                     <button
                       onClick={() => handleDelete(patient._id)}
@@ -285,7 +281,10 @@ function Patients() {
         </div>
       ) : (
         filteredPatients.map((patient) => (
-          <div key={patient._id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div
+            key={patient._id}
+            className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+          >
             <div className="p-5 border-b">
               <div className="flex justify-between items-start">
                 <div className="flex items-center">
@@ -293,23 +292,33 @@ function Patients() {
                     <FaUser className="text-green-600 text-xl" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-gray-900">{patient.name}</h3>
+                    <h3 className="font-medium text-gray-900">
+                      {patient.name}
+                    </h3>
                     <div className="flex items-center mt-1">
                       <FaVenusMars className="text-gray-500 mr-1" />
-                      <span className="text-sm text-gray-600 capitalize">{patient.gender}</span>
+                      <span className="text-sm text-gray-600 capitalize">
+                        {patient.gender}
+                      </span>
                       <span className="mx-2 text-gray-400">•</span>
-                      <span className="text-sm text-gray-600">{patient.age} years</span>
+                      <span className="text-sm text-gray-600">
+                        {patient.age} years
+                      </span>
                     </div>
                   </div>
                 </div>
-                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  patient.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                }`}>
+                <span
+                  className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    patient.status === "active"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
                   {patient.status || "active"}
                 </span>
               </div>
             </div>
-            
+
             <div className="px-5 py-3 border-b space-y-2">
               <div className="flex items-center">
                 <FaEnvelope className="text-gray-500 mr-2" />
@@ -320,7 +329,7 @@ function Patients() {
                 <span className="text-sm text-gray-600">{patient.phone}</span>
               </div>
             </div>
-            
+
             <div className="p-3 flex justify-between items-center bg-gray-50">
               <button
                 onClick={() => setShowDetails(patient._id)}
@@ -328,15 +337,8 @@ function Patients() {
               >
                 <FaEye className="mr-1" /> Details
               </button>
-              
+
               <div className="flex space-x-2">
-                <button
-                  onClick={() => handleStatusChange(patient._id, patient.status === "active" ? "inactive" : "active")}
-                  className={`${patient.status === "active" ? "text-orange-600 hover:text-orange-900" : "text-green-600 hover:text-green-900"} p-1`}
-                  title={patient.status === "active" ? "Deactivate" : "Activate"}
-                >
-                  <FaEdit />
-                </button>
                 <button
                   onClick={() => handleDelete(patient._id)}
                   className="text-red-600 hover:text-red-900 p-1"
@@ -355,8 +357,12 @@ function Patients() {
   return (
     <div className="bg-gray-50 min-h-[92vh] p-6">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Patient Management</h1>
-        <p className="text-gray-600">View and manage all patients in the system</p>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          Patient Management
+        </h1>
+        <p className="text-gray-600">
+          View and manage all patients in the system
+        </p>
       </header>
 
       {/* Filters and Search */}
@@ -374,10 +380,13 @@ function Patients() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
+
           <div className="flex flex-wrap gap-2">
             <div className="flex items-center">
-              <label htmlFor="gender-filter" className="mr-2 text-sm font-medium text-gray-700">
+              <label
+                htmlFor="gender-filter"
+                className="mr-2 text-sm font-medium text-gray-700"
+              >
                 <FaFilter className="inline mr-1" /> Gender:
               </label>
               <select
@@ -391,9 +400,12 @@ function Patients() {
                 <option value="female">Female</option>
               </select>
             </div>
-            
+
             <div className="flex items-center">
-              <label htmlFor="age-filter" className="mr-2 text-sm font-medium text-gray-700">
+              <label
+                htmlFor="age-filter"
+                className="mr-2 text-sm font-medium text-gray-700"
+              >
                 <FaCalendarAlt className="inline mr-1" /> Age:
               </label>
               <select
@@ -409,34 +421,60 @@ function Patients() {
                 <option value="65+">65+ years</option>
               </select>
             </div>
-            
+
             <div className="flex items-center space-x-2 ml-2">
               <button
                 onClick={() => setViewMode("table")}
                 className={`p-2 rounded ${
-                  viewMode === "table" ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-600"
+                  viewMode === "table"
+                    ? "bg-blue-100 text-blue-600"
+                    : "bg-gray-100 text-gray-600"
                 }`}
                 title="Table View"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                  />
                 </svg>
               </button>
               <button
                 onClick={() => setViewMode("card")}
                 className={`p-2 rounded ${
-                  viewMode === "card" ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-600"
+                  viewMode === "card"
+                    ? "bg-blue-100 text-blue-600"
+                    : "bg-gray-100 text-gray-600"
                 }`}
                 title="Card View"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                  />
                 </svg>
               </button>
             </div>
           </div>
         </div>
-        
+
         <div className="mt-4 flex justify-between items-center">
           <div className="text-sm text-gray-600">
             Showing {filteredPatients.length} out of {patients.length} patients
@@ -455,17 +493,18 @@ function Patients() {
         <div className="flex justify-center items-center h-64">
           <div className="w-12 h-12 border-4 border-blue-400 border-t-blue-600 rounded-full animate-spin"></div>
         </div>
+      ) : viewMode === "table" ? (
+        renderTableView()
       ) : (
-        viewMode === "table" ? renderTableView() : renderCardView()
+        renderCardView()
       )}
 
       {/* Patient Details Modal */}
-      <EntityDetailsModal 
+      <EntityDetailsModal
         isOpen={!!showDetails}
         onClose={() => setShowDetails(null)}
-        entity={patients.find(p => p._id === showDetails)} 
+        entity={patients.find((p) => p._id === showDetails)}
         entityType="patient"
-        onStatusChange={handleStatusChange}
         onDelete={handleDelete}
       />
     </div>

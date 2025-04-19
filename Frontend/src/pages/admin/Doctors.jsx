@@ -1,10 +1,22 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { FaUserMd, FaSearch, FaFilter, FaTrash, FaEdit, FaEye, FaPhone, FaEnvelope, FaIdCard, FaGraduationCap, FaBriefcase } from "react-icons/fa";
-import { confirmAlert } from 'react-confirm-alert';
-import 'react-confirm-alert/src/react-confirm-alert.css';
-import EntityDetailsModal from "../../Components/Dashboard/Common/EntityDetailsModal";
+import {
+  FaUserMd,
+  FaSearch,
+  FaFilter,
+  FaTrash,
+  FaEdit,
+  FaEye,
+  FaPhone,
+  FaEnvelope,
+  FaIdCard,
+  FaGraduationCap,
+  FaBriefcase,
+} from "react-icons/fa";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
+import EntityDetailsModal from "../../Components/Modals/Common/EntityDetailsModal";
 
 function Doctors() {
   const [doctors, setDoctors] = useState([]);
@@ -40,9 +52,11 @@ function Doctors() {
       if (data.success) {
         setDoctors(data.doctors || []);
         setFilteredDoctors(data.doctors || []);
-        
+
         // Extract unique specializations for filter
-        const uniqueSpecializations = [...new Set(data.doctors.map(doc => doc.specialization))].filter(Boolean);
+        const uniqueSpecializations = [
+          ...new Set(data.doctors.map((doc) => doc.specialization)),
+        ].filter(Boolean);
         setSpecializations(uniqueSpecializations);
       } else {
         toast.error(data.message || "Failed to fetch doctors");
@@ -71,7 +85,9 @@ function Doctors() {
 
     // Apply specialization filter
     if (specializationFilter !== "all") {
-      results = results.filter((doc) => doc.specialization === specializationFilter);
+      results = results.filter(
+        (doc) => doc.specialization === specializationFilter
+      );
     }
 
     // Apply experience filter
@@ -79,7 +95,10 @@ function Doctors() {
       if (experienceFilter === "0-5") {
         results = results.filter((doc) => parseInt(doc.experience) <= 5);
       } else if (experienceFilter === "6-10") {
-        results = results.filter((doc) => parseInt(doc.experience) > 5 && parseInt(doc.experience) <= 10);
+        results = results.filter(
+          (doc) =>
+            parseInt(doc.experience) > 5 && parseInt(doc.experience) <= 10
+        );
       } else if (experienceFilter === "11+") {
         results = results.filter((doc) => parseInt(doc.experience) > 10);
       }
@@ -90,11 +109,12 @@ function Doctors() {
 
   const handleDelete = (doctorId) => {
     confirmAlert({
-      title: 'Delete Doctor',
-      message: 'Are you sure you want to delete this doctor? All appointments with this doctor will also be affected.',
+      title: "Delete Doctor",
+      message:
+        "Are you sure you want to delete this doctor? All appointments with this doctor will also be affected.",
       buttons: [
         {
-          label: 'Yes',
+          label: "Yes",
           onClick: async () => {
             try {
               const { data } = await axios.post(
@@ -108,7 +128,7 @@ function Doctors() {
                   },
                 }
               );
-              
+
               if (data.success) {
                 toast.success("Doctor deleted successfully");
                 fetchDoctors();
@@ -119,16 +139,15 @@ function Doctors() {
               console.error("Error deleting doctor:", error);
               toast.error("Error deleting doctor");
             }
-          }
+          },
         },
         {
-          label: 'No',
-          onClick: () => {}
-        }
-      ]
+          label: "No",
+          onClick: () => {},
+        },
+      ],
     });
   };
-
 
   const renderTableView = () => (
     <div className="overflow-x-auto rounded-lg border border-gray-200">
@@ -182,10 +201,14 @@ function Doctors() {
                   <div className="text-sm text-gray-500">{doctor.phone}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{doctor.specialization}</div>
+                  <div className="text-sm text-gray-900">
+                    {doctor.specialization}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{doctor.experience} years</div>
+                  <div className="text-sm text-gray-900">
+                    {doctor.experience} years
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex justify-end space-x-2">
@@ -221,7 +244,10 @@ function Doctors() {
         </div>
       ) : (
         filteredDoctors.map((doctor) => (
-          <div key={doctor._id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div
+            key={doctor._id}
+            className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+          >
             <div className="p-5 border-b">
               <div className="flex justify-between items-start">
                 <div className="flex items-center">
@@ -229,28 +255,38 @@ function Doctors() {
                     <FaUserMd className="text-blue-600 text-xl" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-gray-900">Dr. {doctor.name}</h3>
+                    <h3 className="font-medium text-gray-900">
+                      Dr. {doctor.name}
+                    </h3>
                     <p className="text-sm text-gray-600">{doctor.education}</p>
                   </div>
                 </div>
-                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  doctor.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                }`}>
+                <span
+                  className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    doctor.status === "active"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
                   {doctor.status || "active"}
                 </span>
               </div>
             </div>
-            
+
             <div className="px-5 py-3 border-b">
-              <div className="text-sm font-medium text-gray-700 mb-1">Specialization:</div>
+              <div className="text-sm font-medium text-gray-700 mb-1">
+                Specialization:
+              </div>
               <div className="flex items-center">
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                   {doctor.specialization}
                 </span>
-                <span className="ml-3 text-sm text-gray-600">{doctor.experience} years of experience</span>
+                <span className="ml-3 text-sm text-gray-600">
+                  {doctor.experience} years of experience
+                </span>
               </div>
             </div>
-            
+
             <div className="px-5 py-3 border-b space-y-2">
               <div className="flex items-center">
                 <FaEnvelope className="text-gray-500 mr-2" />
@@ -261,7 +297,7 @@ function Doctors() {
                 <span className="text-sm text-gray-600">{doctor.phone}</span>
               </div>
             </div>
-            
+
             <div className="p-3 flex justify-between items-center bg-gray-50">
               <button
                 onClick={() => setShowDetails(doctor._id)}
@@ -269,7 +305,7 @@ function Doctors() {
               >
                 <FaEye className="mr-1" /> Details
               </button>
-              
+
               <div className="flex space-x-2">
                 <button
                   onClick={() => handleDelete(doctor._id)}
@@ -289,8 +325,12 @@ function Doctors() {
   return (
     <div className="bg-gray-50 min-h-[92vh] p-6">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Doctor Management</h1>
-        <p className="text-gray-600">View and manage all doctors in the system</p>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          Doctor Management
+        </h1>
+        <p className="text-gray-600">
+          View and manage all doctors in the system
+        </p>
       </header>
 
       {/* Filters and Search */}
@@ -308,10 +348,13 @@ function Doctors() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
+
           <div className="flex flex-wrap gap-2">
             <div className="flex items-center">
-              <label htmlFor="specialization-filter" className="mr-2 text-sm font-medium text-gray-700">
+              <label
+                htmlFor="specialization-filter"
+                className="mr-2 text-sm font-medium text-gray-700"
+              >
                 <FaFilter className="inline mr-1" /> Specialization:
               </label>
               <select
@@ -322,13 +365,18 @@ function Doctors() {
               >
                 <option value="all">All</option>
                 {specializations.map((spec) => (
-                  <option key={spec} value={spec}>{spec}</option>
+                  <option key={spec} value={spec}>
+                    {spec}
+                  </option>
                 ))}
               </select>
             </div>
-            
+
             <div className="flex items-center">
-              <label htmlFor="experience-filter" className="mr-2 text-sm font-medium text-gray-700">
+              <label
+                htmlFor="experience-filter"
+                className="mr-2 text-sm font-medium text-gray-700"
+              >
                 <FaBriefcase className="inline mr-1" /> Experience:
               </label>
               <select
@@ -343,34 +391,60 @@ function Doctors() {
                 <option value="11+">11+ years</option>
               </select>
             </div>
-            
+
             <div className="flex items-center space-x-2 ml-2">
               <button
                 onClick={() => setViewMode("table")}
                 className={`p-2 rounded ${
-                  viewMode === "table" ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-600"
+                  viewMode === "table"
+                    ? "bg-blue-100 text-blue-600"
+                    : "bg-gray-100 text-gray-600"
                 }`}
                 title="Table View"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                  />
                 </svg>
               </button>
               <button
                 onClick={() => setViewMode("card")}
                 className={`p-2 rounded ${
-                  viewMode === "card" ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-600"
+                  viewMode === "card"
+                    ? "bg-blue-100 text-blue-600"
+                    : "bg-gray-100 text-gray-600"
                 }`}
                 title="Card View"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                  />
                 </svg>
               </button>
             </div>
           </div>
         </div>
-        
+
         <div className="mt-4 flex justify-between items-center">
           <div className="text-sm text-gray-600">
             Showing {filteredDoctors.length} out of {doctors.length} doctors
@@ -389,15 +463,17 @@ function Doctors() {
         <div className="flex justify-center items-center h-64">
           <div className="w-12 h-12 border-4 border-blue-400 border-t-blue-600 rounded-full animate-spin"></div>
         </div>
+      ) : viewMode === "table" ? (
+        renderTableView()
       ) : (
-        viewMode === "table" ? renderTableView() : renderCardView()
+        renderCardView()
       )}
 
       {/* Doctor Details Modal */}
-      <EntityDetailsModal 
+      <EntityDetailsModal
         isOpen={!!showDetails}
         onClose={() => setShowDetails(null)}
-        entity={doctors.find(d => d._id === showDetails)} 
+        entity={doctors.find((d) => d._id === showDetails)}
         entityType="doctor"
         onDelete={handleDelete}
       />

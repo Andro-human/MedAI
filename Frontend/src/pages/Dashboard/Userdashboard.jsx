@@ -9,9 +9,9 @@ import {
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { confirmAlert } from 'react-confirm-alert'; 
-import 'react-confirm-alert/src/react-confirm-alert.css';
-import RescheduleModal from "../../Components/Dashboard/Appointments/RescheduleModal";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
+import RescheduleModal from "../../Components/Modals/Appointments/RescheduleModal";
 
 function Userdashboard() {
   const { user } = useSelector((state) => state.auth);
@@ -25,31 +25,34 @@ function Userdashboard() {
 
   const formatTimeTo12Hour = (time) => {
     if (!time) return "";
-    
-    if (time.includes('AM') || time.includes('PM')) {
+
+    if (time.includes("AM") || time.includes("PM")) {
       return time;
     }
-    
-    const timeParts = time.split(':');
+
+    const timeParts = time.split(":");
     let hours = parseInt(timeParts[0], 10);
     const minutes = timeParts[1];
-    
+
     // Determine AM/PM and convert hours
-    const period = hours >= 12 ? 'PM' : 'AM';
+    const period = hours >= 12 ? "PM" : "AM";
     hours = hours % 12;
     hours = hours ? hours : 12; // Convert 0 to 12 for 12 AM
-    
+
     // Format with leading zero for minutes
     return `${hours}:${minutes} ${period}`;
   };
 
   const fetchDoctorAppointments = async () => {
     try {
-      const { data } = await axios.get(`${import.meta.env.VITE_SERVER}appointment/get-doctor-appointment`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_SERVER}appointment/get-doctor-appointment`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       if (data.success) {
         setAppointments(data.appointments);
       }
@@ -95,16 +98,17 @@ function Userdashboard() {
 
   // Process appointment data to include doctor information
   const users = appointments.map((appointment) => {
-    const userDetails = user?.role === "user" ? appointment.doctor : appointment.patient || {};
+    const userDetails =
+      user?.role === "user" ? appointment.doctor : appointment.patient || {};
     return {
       ...appointment,
-        ...(user.role === "user" && {
-          doctorName: userDetails.name || "Unknown Doctor",
-          specialization: userDetails.specialization || "General",
-        }),
-        ...(user.role === "doctor" && {
-          patientName: userDetails.name || "Unknown Patient",
-        }),
+      ...(user.role === "user" && {
+        doctorName: userDetails.name || "Unknown Doctor",
+        specialization: userDetails.specialization || "General",
+      }),
+      ...(user.role === "doctor" && {
+        patientName: userDetails.name || "Unknown Patient",
+      }),
       date: appointment.date,
       timeslot: formatTimeTo12Hour(appointment.timeslot),
       age: userDetails.age,
@@ -133,7 +137,7 @@ function Userdashboard() {
         return "bg-blue-100 text-blue-800 border-blue-200";
     }
   };
-  
+
   const handleReschedule = (appointment) => {
     setSelectedAppointment(appointment);
     setIsRescheduleModalOpen(true);
@@ -141,14 +145,15 @@ function Userdashboard() {
 
   const handleDelete = (appointmentId) => {
     confirmAlert({
-      title: 'Cancel Appointment',
-      message: 'Are you sure you want to cancel this appointment?',
+      title: "Cancel Appointment",
+      message: "Are you sure you want to cancel this appointment?",
       buttons: [
         {
-          label: 'Yes',
+          label: "Yes",
           onClick: async () => {
             try {
-              const { data } = await axios.post(`${import.meta.env.VITE_SERVER}appointment/cancel-appointment/`, 
+              const { data } = await axios.post(
+                `${import.meta.env.VITE_SERVER}appointment/cancel-appointment/`,
                 {
                   appointmentId,
                 },
@@ -156,7 +161,8 @@ function Userdashboard() {
                   headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                   },
-                });
+                }
+              );
               if (data.success) {
                 toast.success(data.message);
                 window.location.reload();
@@ -167,13 +173,13 @@ function Userdashboard() {
               console.error(error);
               toast.error("Failed to cancel appointment");
             }
-          }
+          },
         },
         {
-          label: 'No',
-          onClick: () => {}
-        }
-      ]
+          label: "No",
+          onClick: () => {},
+        },
+      ],
     });
   };
 
@@ -189,7 +195,9 @@ function Userdashboard() {
           Welcome back, {user?.name || "Patient"}!
         </h1>
         <p className="text-gray-600 mt-2">
-          {user?.role === "user" ? "Here's a summary of your medical appointments and health journey" : "Here's a summary of your appointments"}
+          {user?.role === "user"
+            ? "Here's a summary of your medical appointments and health journey"
+            : "Here's a summary of your appointments"}
         </p>
       </div>
 
@@ -229,10 +237,24 @@ function Userdashboard() {
               <FaUserMd className="text-purple-600 text-xl" />
             </div>
             <div>
-              <p className="text-gray-500 text-sm">{user?.role === "user" ? "Different users" : "Different Patients"}</p>
+              <p className="text-gray-500 text-sm">
+                {user?.role === "user"
+                  ? "Different users"
+                  : "Different Patients"}
+              </p>
               <h3 className="text-2xl font-bold text-gray-800">
                 {/* Get unique count of doctor IDs from appointments */}
-                {Array.from(new Set(appointments.map(app => user?.role === "user" ? app.doctor?._id : app.patient?._id))).filter(Boolean).length}
+                {
+                  Array.from(
+                    new Set(
+                      appointments.map((app) =>
+                        user?.role === "user"
+                          ? app.doctor?._id
+                          : app.patient?._id
+                      )
+                    )
+                  ).filter(Boolean).length
+                }
               </h3>
             </div>
           </div>
@@ -292,7 +314,10 @@ function Userdashboard() {
                     <div className="text-center py-8">
                       <p className="text-gray-500">No upcoming appointments</p>
                       {user?.role === "user" && (
-                        <button onClick={() => navigate("/book-appointment")} className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+                        <button
+                          onClick={() => navigate("/book-appointment")}
+                          className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors"
+                        >
                           Book New Appointment
                         </button>
                       )}
@@ -306,22 +331,26 @@ function Userdashboard() {
                         >
                           <div className="flex-1">
                             <div className="flex gap-4">
-                            <h3 className="font-semibold text-lg text-gray-800">
-                              {user?.role === "user" ? appointment.doctorName : appointment.patientName}
-                            </h3>
-                            <p className="text-sm text-gray-700 mt-1">
-                              {appointment.age}
-                            </p>
+                              <h3 className="font-semibold text-lg text-gray-800">
+                                {user?.role === "user"
+                                  ? appointment.doctorName
+                                  : appointment.patientName}
+                              </h3>
+                              <p className="text-sm text-gray-700 mt-1">
+                                {appointment.age}
+                              </p>
                             </div>
                             <div className="flex gap-4">
-                            <p className="text-sm text-gray-500">
-                              {appointment.gender}
-                            </p>
-                            {user?.role === "user" && <p className="text-sm text-gray-500">
-                              {appointment.specialization}
-                            </p>}
+                              <p className="text-sm text-gray-500">
+                                {appointment.gender}
+                              </p>
+                              {user?.role === "user" && (
+                                <p className="text-sm text-gray-500">
+                                  {appointment.specialization}
+                                </p>
+                              )}
                             </div>
-                            
+
                             <div className="flex flex-col sm:flex-row sm:items-center gap-y-2 sm:gap-x-4 mt-2 text-gray-600">
                               <div className="flex items-center">
                                 <FaCalendarAlt className="text-blue-500 mr-2" />
@@ -346,7 +375,7 @@ function Userdashboard() {
                               </div>
                               <span
                                 className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusClass(
-                                    "scheduled"
+                                  "scheduled"
                                 )}`}
                               >
                                 Scheduled
@@ -354,14 +383,14 @@ function Userdashboard() {
                             </div>
                           </div>
                           <div className="mt-4 md:mt-0 flex gap-2">
-                            <button 
-                              onClick={() => handleReschedule(appointment)} 
+                            <button
+                              onClick={() => handleReschedule(appointment)}
                               className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm transition-colors"
                             >
                               Reschedule
                             </button>
-                            <button 
-                              onClick={() => handleDelete(appointment._id)} 
+                            <button
+                              onClick={() => handleDelete(appointment._id)}
                               className="border border-red-300 hover:bg-red-50 text-red-600 py-2 px-4 rounded-lg text-sm transition-colors"
                             >
                               Cancel
@@ -388,23 +417,27 @@ function Userdashboard() {
                           className="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow duration-200"
                         >
                           <div className="flex flex-col md:flex-row md:items-center">
-                          <div className="flex-1">
-                            <div className="flex gap-4">
-                            <h3 className="font-semibold text-lg text-gray-800">
-                              {user?.role === "user" ? appointment.doctorName : appointment.patientName}
-                            </h3>
-                            <p className="text-sm text-gray-700 mt-1">
-                              {appointment.age}
-                            </p>
-                            </div>
-                            <div className="flex gap-4">
-                            <p className="text-sm text-gray-500">
-                              {appointment.gender}
-                            </p>
-                           {user?.role === "user" && <p className="text-sm text-gray-500">
-                              {appointment.specialization}
-                            </p>}
-                            </div>
+                            <div className="flex-1">
+                              <div className="flex gap-4">
+                                <h3 className="font-semibold text-lg text-gray-800">
+                                  {user?.role === "user"
+                                    ? appointment.doctorName
+                                    : appointment.patientName}
+                                </h3>
+                                <p className="text-sm text-gray-700 mt-1">
+                                  {appointment.age}
+                                </p>
+                              </div>
+                              <div className="flex gap-4">
+                                <p className="text-sm text-gray-500">
+                                  {appointment.gender}
+                                </p>
+                                {user?.role === "user" && (
+                                  <p className="text-sm text-gray-500">
+                                    {appointment.specialization}
+                                  </p>
+                                )}
+                              </div>
                               <div className="flex flex-col sm:flex-row sm:items-center gap-y-2 sm:gap-x-4 mt-2 text-gray-600">
                                 <div className="flex items-center">
                                   <FaCalendarAlt className="text-blue-500 mr-2" />
@@ -437,8 +470,20 @@ function Userdashboard() {
                               </div>
                             </div>
                             <div className="mt-4 md:mt-0">
-                              <button onClick={() => navigate(`/chat/${user?.role === "user" ? appointment.doctor._id : appointment.patient._id}`)} className="bg-white border border-blue-500 text-blue-600 py-2 px-4 rounded-lg text-sm transition-colors hover:bg-blue-50">
-                                Chat with {user?.role === "user" ? "Doctor" : "Patient"}
+                              <button
+                                onClick={() =>
+                                  navigate(
+                                    `/chat/${
+                                      user?.role === "user"
+                                        ? appointment.doctor._id
+                                        : appointment.patient._id
+                                    }`
+                                  )
+                                }
+                                className="bg-white border border-blue-500 text-blue-600 py-2 px-4 rounded-lg text-sm transition-colors hover:bg-blue-50"
+                              >
+                                Chat with{" "}
+                                {user?.role === "user" ? "Doctor" : "Patient"}
                               </button>
                             </div>
                           </div>

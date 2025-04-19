@@ -55,18 +55,18 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate form data
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
       toast.error("Please enter a valid email address");
       return;
     }
-    
+
     if (formData.password.length < 6) {
       toast.error("Password must be at least 6 characters");
       return;
     }
-    
+
     if (formData.role === "doctor") {
       if (parseInt(formData.age) < 21 || parseInt(formData.age) > 120) {
         toast.error("For doctors, age must be between 21 and 120");
@@ -78,31 +78,34 @@ const Signup = () => {
         return;
       }
     }
-    
+
     if (!/^\d{10}$/.test(formData.phone)) {
       toast.error("Please enter a valid 10-digit phone number");
       return;
     }
-    
+
     if (formData.role === "doctor") {
       if (!formData.specialization) {
         toast.error("Please select your specialization");
         return;
       }
-      
-      if (parseInt(formData.experience) < 0 || parseInt(formData.experience) > 50) {
+
+      if (
+        parseInt(formData.experience) < 0 ||
+        parseInt(formData.experience) > 50
+      ) {
         toast.error("Experience must be between 0 and 50 years");
         return;
       }
-      
+
       if (formData.education.length < 2) {
         toast.error("Please enter valid education qualification");
         return;
       }
     }
-    
+
     setLoading(true);
-    
+
     console.log(formData);
     try {
       const { data } = await axios.post(
@@ -190,15 +193,17 @@ const Signup = () => {
                 value={formData.email}
                 onChange={handleChange}
                 className={`w-full bg-white bg-opacity-80 rounded-lg border ${
-                  formData.email && !/\S+@\S+\.\S+/.test(formData.email) 
-                    ? "border-red-500" 
+                  formData.email && !/\S+@\S+\.\S+/.test(formData.email)
+                    ? "border-red-500"
                     : "border-gray-300"
                 } p-3 focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 placeholder="Enter your email"
                 required
               />
               {formData.email && !/\S+@\S+\.\S+/.test(formData.email) && (
-                <p className="text-red-500 text-sm mt-1">Please enter a valid email address</p>
+                <p className="text-red-500 text-sm mt-1">
+                  Please enter a valid email address
+                </p>
               )}
             </div>
 
@@ -216,15 +221,17 @@ const Signup = () => {
                 value={formData.password}
                 onChange={handleChange}
                 className={`w-full bg-white bg-opacity-80 rounded-lg border ${
-                  formData.password && formData.password.length < 6 
-                    ? "border-red-500" 
+                  formData.password && formData.password.length < 6
+                    ? "border-red-500"
                     : "border-gray-300"
                 } p-3 focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 placeholder="Create a strong password"
                 required
               />
               {formData.password && formData.password.length < 6 && (
-                <p className="text-red-500 text-sm mt-1">Password must be at least 6 characters</p>
+                <p className="text-red-500 text-sm mt-1">
+                  Password must be at least 6 characters
+                </p>
               )}
             </div>
 
@@ -268,16 +275,21 @@ const Signup = () => {
                 value={formData.age}
                 onChange={handleChange}
                 className={`w-full bg-white bg-opacity-80 rounded-lg border ${
-                  formData.age && (parseInt(formData.age) < 1 || parseInt(formData.age) > 120) 
-                    ? "border-red-500" 
+                  formData.age &&
+                  (parseInt(formData.age) < 1 || parseInt(formData.age) > 120)
+                    ? "border-red-500"
                     : "border-gray-300"
                 } p-3 focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 placeholder="Enter your age"
                 required
               />
-              {formData.age && (parseInt(formData.age) < 1 || parseInt(formData.age) > 120) && (
-                <p className="text-red-500 text-sm mt-1">Age must be between 1 and 120</p>
-              )}
+              {formData.age &&
+                (parseInt(formData.age) < 1 ||
+                  parseInt(formData.age) > 120) && (
+                  <p className="text-red-500 text-sm mt-1">
+                    Age must be between 1 and 120
+                  </p>
+                )}
             </div>
 
             <div className="mb-4">
@@ -324,15 +336,17 @@ const Signup = () => {
                 value={formData.phone}
                 onChange={handleChange}
                 className={`w-full bg-white bg-opacity-80 rounded-lg border ${
-                  formData.phone && !/^\d{10}$/.test(formData.phone) 
-                    ? "border-red-500" 
+                  formData.phone && !/^\d{10}$/.test(formData.phone)
+                    ? "border-red-500"
                     : "border-gray-300"
                 } p-3 focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 placeholder="Enter your 10-digit phone number"
                 required
               />
               {formData.phone && !/^\d{10}$/.test(formData.phone) && (
-                <p className="text-red-500 text-sm mt-1">Please enter a valid 10-digit phone number</p>
+                <p className="text-red-500 text-sm mt-1">
+                  Please enter a valid 10-digit phone number
+                </p>
               )}
             </div>
 
@@ -385,9 +399,13 @@ const Signup = () => {
                     placeholder="Enter years of experience"
                     required={formData.role === "doctor"}
                   />
-                  {formData.experience && (parseInt(formData.experience) < 0 || parseInt(formData.experience) > 50) && (
-                    <p className="text-red-500 text-sm mt-1">Experience must be between 0 and 50 years</p>
-                  )}
+                  {formData.experience &&
+                    (parseInt(formData.experience) < 0 ||
+                      parseInt(formData.experience) > 50) && (
+                      <p className="text-red-500 text-sm mt-1">
+                        Experience must be between 0 and 50 years
+                      </p>
+                    )}
                 </div>
 
                 <div className="mb-4">
@@ -408,7 +426,9 @@ const Signup = () => {
                     required={formData.role === "doctor"}
                   />
                   {formData.education && formData.education.length < 2 && (
-                    <p className="text-red-500 text-sm mt-1">Please enter valid education qualification</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      Please enter valid education qualification
+                    </p>
                   )}
                 </div>
               </>
@@ -497,7 +517,9 @@ const Signup = () => {
           </div>
         </div>
 
-        <form className="max-h-[70vh] overflow-y-auto pr-2">{renderStep()}</form>
+        <form className="max-h-[70vh] overflow-y-auto pr-2">
+          {renderStep()}
+        </form>
       </div>
     </div>
   );
