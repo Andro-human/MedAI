@@ -5,7 +5,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { FaUser, FaLock, FaUserMd, FaUserCog } from "react-icons/fa";
-import medicalIllustration from "../../assets/sidebar.png";
+import loginImage from "../../assets/Auth/Login.jpg";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -32,11 +32,6 @@ const Login = () => {
         dispatch(userExists(data.user));
 
         toast.success(data.message);
-        setTimeout(() => {
-          if (role === "user") window.location.replace("/userdashboard");
-          if (role === "doctor") window.location.replace("/doctor-dashboard");
-          if (role === "admin") window.location.replace("/admin-dashboard");
-        }, 2000);
       } else {
         toast.error(data.message || "Login failed");
       }
@@ -81,9 +76,9 @@ const Login = () => {
           </p>
           <div className="flex justify-center">
             <img
-              src={medicalIllustration}
+              src={loginImage}
               alt="Medical illustration"
-              className="w-3/5"
+              className="rounded-full shadow-lg"
             />
           </div>
         </div>

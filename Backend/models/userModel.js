@@ -13,11 +13,17 @@ const userSchema = new mongoose.Schema(
     },
     age: {
       type: Number,
-      required: function () {
-        if (this.role === "user" || this.role === "doctor") return true;
-        return false;
+      required: true,
+      min: 1,
+      validate: {
+        validator: function (value) {
+          if (this.role === "doctor" && value < 21) {
+            return false;
+          }
+          return true;
+        },
+        message: "Doctors must be at least 21 years old",
       },
-      min: 0,
     },
     gender: {
       type: String,
@@ -25,11 +31,11 @@ const userSchema = new mongoose.Schema(
         if (this.role === "user" || this.role === "doctor") return true;
         return false;
       },
-      enum: ["male", "female"]
+      enum: ["male", "female"],
     },
     email: {
       type: String,
-      require: [true, "email is required"],
+      required: [true, "email is required"],
       unique: true,
     },
 
@@ -45,7 +51,7 @@ const userSchema = new mongoose.Schema(
         if (this.role === "user" || this.role === "doctor") return true;
         return false;
       },
-      min: 10
+      min: 10,
     },
     specialization: {
       type: String,
@@ -73,7 +79,7 @@ const userSchema = new mongoose.Schema(
       required: function () {
         if (this.role === "doctor") return true;
         return false;
-      },  
+      },
     },
     experience: {
       type: Number,

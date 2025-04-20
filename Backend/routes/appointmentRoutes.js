@@ -1,15 +1,10 @@
 const express = require("express");
 const {
   createAppointmentController,
-  getAppointmentController,
   getDoctorController,
-  getAllUsers,
-  getAllDoctors,
-  getAllAppointments,
   getPatientAppointmentController,
   getDoctorAppointmentController,
   getAvailableTimeslotsController,
-  getAllTimeslotsController,
   cancelAppointmentController,
   rescheduleAppointmentController,
 } = require("../controllers/appointmentController");
@@ -34,7 +29,6 @@ router.post(
   authMiddleware,
   getAvailableTimeslotsController
 );
-router.get("/get-all-timeslots", authMiddleware, getAllTimeslotsController);
 router.post("/cancel-appointment", authMiddleware, cancelAppointmentController);
 router.post(
   "/reschedule-appointment",
@@ -42,8 +36,5 @@ router.post(
   rescheduleAppointmentController
 );
 
-// admin routes
-router.get("/getAllUser", authMiddleware, getAllUsers);
-router.get("/getAllDoctor", authMiddleware, getAllDoctors);
-router.get("/getAllAppointment", authMiddleware, getAllAppointments);
+
 module.exports = router;

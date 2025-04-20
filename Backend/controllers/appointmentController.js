@@ -191,7 +191,7 @@ const getPatientAppointmentController = async (req, res) => {
       .find({
         patient: req.body.userId,
       })
-      .populate("doctor", "name specialization email phone");
+      .populate("doctor", "name specialization age gender");
 
     return res.status(200).send({
       success: true,
@@ -210,12 +210,11 @@ const getPatientAppointmentController = async (req, res) => {
 
 const getDoctorAppointmentController = async (req, res) => {
   try {
-    // Find appointments for the doctor with populated patient information
     const appointments = await appointmentModel
       .find({
         doctor: req.body.userId,
       })
-      .populate("patient", "name email phone age gender");
+      .populate("patient", "name age gender");
 
     return res.status(200).send({
       success: true,
@@ -260,151 +259,30 @@ const getDoctorController = async (req, res) => {
   }
 };
 
-const getAllDoctors = async (req, res) => {
-  try {
-    const user = await userModel.findOne({ _id: req.body.userId });
-    if (user.role != "admin") {
-      return res.status(401).send({
-        success: false,
-        message: "Unauthorized Access",
-      });
-    }
-
-    const doctors = await userModel.find({ role: "doctor" });
-    return res.status(200).send({
-      success: true,
-      message: "Successfully fetched all the doctors",
-      doctors,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).send({
-      success: false,
-      message: "Error in getAllDoctors API",
-      error,
-    });
-  }
-};
-
-const getAllUsers = async (req, res) => {
-  try {
-    const user = await userModel.findOne({ _id: req.body.userId });
-    if (user.role != "admin") {
-      return res.status(401).send({
-        success: false,
-        message: "Unauthorized Access",
-      });
-    }
-    const users = await userModel.find({ role: "user" });
-    return res.status(200).send({
-      success: true,
-      message: "Successfully fetched all the users",
-      users,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).send({
-      success: false,
-      message: "Error in getAllUsers API",
-      error,
-    });
-  }
-};
-
-const getAllAppointments = async (req, res) => {
-  try {
-    const user = await userModel.findOne({ _id: req.body.userId });
-    if (user.role != "admin") {
-      return res.status(401).send({
-        success: false,
-        message: "Unauthorized Access",
-      });
-    }
-
-    const appointments = await appointmentModel
-      .find()
-      .populate("doctor", "name email phone specialization")
-      .populate("patient", "name email phone");
-
-    return res.status(200).send({
-      success: true,
-      message: "Successfully fetched all the Appointments",
-      appointments,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).send({
-      success: false,
-      message: "Error in getAllAppointments API",
-      error,
-    });
-  }
-};
-
 // Get all available timeslots
-const getAllTimeslotsController = async (req, res) => {
-  try {
-    return res.status(200).send({
-      success: true,
-      message: "Successfully fetched all timeslots",
-      timeslots: AVAILABLE_TIMESLOTS,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).send({
-      success: false,
-      message: "Error in getAllTimeslots API",
-      error,
-    });
-  }
-};
-
-// Cancel appointment function
-const cancelAppointmentController = async (req, res) => {
-  try {
-    const { appointmentId, userId } = req.body;
-
-    // Find the appointment
-    const appointment = await appointmentModel.findById(appointmentId);
-
-    // Check if appointment exists
-    if (!appointment) {
-      return res.status(404).send({
-        success: false,
-        message: "Appointment not found",
-      });
-    }
-
-    // Verify that the user is the patient who booked the appointment
-    if (appointment.patient.toString() !== userId) {
-      return res.status(403).send({
-        success: false,
-        message: "You are not authorized to cancel this appointment",
-      });
-    }
-
-    // Delete the appointment
-    await appointmentModel.findByIdAndDelete(appointmentId);
-
-    return res.status(200).send({
-      success: true,
-      message: "Appointment canceled successfully",
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).send({
-      success: false,
-      message: "Error in cancelAppointment API",
-      error,
-    });
-  }
-};
+// const getAllTimeslotsController = async (req, res) => {
+//   try {
+//     return res.status(200).send({
+//       success: true,
+//       message: "Successfully fetched all timeslots",
+//       timeslots: AVAILABLE_TIMESLOTS,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).send({
+//       success: false,
+//       message: "Error in getAllTimeslots API",
+//       error,
+//     });
+//   }
+// };
 
 // Reschedule appointment function
 const rescheduleAppointmentController = async (req, res) => {
   try {
     const { appointmentId, userId, date, time } = req.body;
 
+    const user = await userModel.findById(userId);
     // Validate the time against available timeslots
     if (!AVAILABLE_TIMESLOTS.includes(time)) {
       return res.status(400).send({
@@ -426,7 +304,11 @@ const rescheduleAppointmentController = async (req, res) => {
     }
 
     // Verify that the user is the patient who booked the appointment
-    if (appointment.patient.toString() !== userId) {
+    if (
+      appointment.patient.toString() !== userId &&
+      appointment.doctor.toString() !== userId &&
+      user?.role !== "admin"
+    ) {
       return res.status(403).send({
         success: false,
         message: "You are not authorized to reschedule this appointment",
@@ -476,16 +358,57 @@ const rescheduleAppointmentController = async (req, res) => {
   }
 };
 
+// Cancel appointment function
+const cancelAppointmentController = async (req, res) => {
+  try {
+    const { appointmentId, userId } = req.body;
+    const user = await userModel.findById(userId);
+    // Find the appointment
+    const appointment = await appointmentModel.findById(appointmentId);
+
+    // Check if appointment exists
+    if (!appointment) {
+      return res.status(404).send({
+        success: false,
+        message: "Appointment not found",
+      });
+    }
+
+    // Verify that the user is the patient who booked the appointment
+    if (
+      appointment.patient.toString() !== userId &&
+      appointment.doctor.toString() !== userId &&
+      user?.role !== "admin"
+    ) {
+      return res.status(403).send({
+        success: false,
+        message: "You are not authorized to cancel this appointment",
+      });
+    }
+
+    // Delete the appointment
+    await appointmentModel.findByIdAndDelete(appointmentId);
+
+    return res.status(200).send({
+      success: true,
+      message: "Appointment canceled successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in cancelAppointment API",
+      error,
+    });
+  }
+};
+
 module.exports = {
   createAppointmentController,
   getPatientAppointmentController,
   getDoctorAppointmentController,
   getDoctorController,
-  getAllDoctors,
-  getAllUsers,
-  getAllAppointments,
   getAvailableTimeslotsController,
-  getAllTimeslotsController,
   cancelAppointmentController,
   rescheduleAppointmentController,
 };
