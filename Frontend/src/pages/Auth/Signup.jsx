@@ -106,7 +106,7 @@ const Signup = () => {
 
     setLoading(true);
 
-    console.log(formData);
+    formData;
     try {
       const { data } = await axios.post(
         `${import.meta.env.VITE_SERVER}api/auth/register`,

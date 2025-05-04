@@ -110,7 +110,7 @@ function Analytics() {
           }
         );
 
-        console.log("data", data);
+        "data", data;
         if (data.success) {
           const appointmentTrendArray = transformAppointmentTrend(
             data?.analytics?.appointmentTrends

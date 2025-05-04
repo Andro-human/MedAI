@@ -24,8 +24,8 @@ function Chat() {
   const socket = GetSocket();
 
   const newMessageListener = (message) => {
-    console.log("newMessage", message);
-    console.log("selectedConversation", selectedConversation);
+    "newMessage", message;
+    "selectedConversation", selectedConversation;
     if (message.conversationId === selectedConversation?._id) {
       setMessages((prevMessages) => [...prevMessages, message?.message]);
     }

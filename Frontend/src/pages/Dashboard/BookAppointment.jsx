@@ -63,7 +63,7 @@ function BookAppointment() {
     }
   };
 
-  console.log(doctors);
+  doctors;
   // Handle specialization selection
   const handleSpecializationSelect = (specialization) => {
     setSelectedSpecialization(specialization);
@@ -122,7 +122,7 @@ function BookAppointment() {
       setLoading(true);
 
       // Parse the time properly
-      // console.log("selectedTime", selectedTime);
+      // ("selectedTime", selectedTime);
 
       const { data } = await axios.post(
         `${import.meta.env.VITE_SERVER}api/appointment/create-appointment`,
@@ -178,7 +178,7 @@ function BookAppointment() {
           },
         }
       );
-      console.log("timeslots", data);
+      "timeslots", data;
       if (data.success) {
         setAvailableTimeSlots(data.availableTimeslots || []);
       } else {

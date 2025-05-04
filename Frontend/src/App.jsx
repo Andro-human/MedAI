@@ -36,7 +36,6 @@ function App() {
         },
       })
       .then(({ data }) => {
-        console.log(data);
         dispatch(userExists(data.user));
       })
       .catch(() => {
@@ -44,7 +43,6 @@ function App() {
         localStorage.clear();
       });
   }, [dispatch]);
-  console.log("user", user);
 
   return isLoading ? (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">

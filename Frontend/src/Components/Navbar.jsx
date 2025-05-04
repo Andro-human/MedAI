@@ -3,14 +3,16 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import MedAi from "../assets/MedAi.png";
 import { useDispatch, useSelector } from "react-redux";
 import { userNotExists } from "../redux/reducers/auth";
-
+import { GetSocket } from "../socket";
 function Navbar() {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const socket = GetSocket();
   const handleLogout = () => {
     localStorage.removeItem("token");
     dispatch(userNotExists());
+    socket.disconnect();
     navigate("/");
   };
   return (
