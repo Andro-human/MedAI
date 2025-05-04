@@ -109,7 +109,7 @@ const Signup = () => {
     console.log(formData);
     try {
       const { data } = await axios.post(
-        `${import.meta.env.VITE_SERVER}auth/register`,
+        `${import.meta.env.VITE_SERVER}api/auth/register`,
         formData
       );
 

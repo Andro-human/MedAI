@@ -39,7 +39,7 @@ function Patients() {
     try {
       setLoading(true);
       const { data } = await axios.get(
-        `${import.meta.env.VITE_SERVER}admin/getAllUsers`,
+        `${import.meta.env.VITE_SERVER}api/admin/getAllUsers`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -144,7 +144,7 @@ function Patients() {
           onClick: async () => {
             try {
               const { data } = await axios.post(
-                `${import.meta.env.VITE_SERVER}admin/deleteUser`,
+                `${import.meta.env.VITE_SERVER}api/admin/deleteUser`,
                 {
                   userToBeDeletedId: patientId,
                 },

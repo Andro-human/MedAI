@@ -41,7 +41,7 @@ function BookAppointment() {
     try {
       setLoading(true);
       const { data } = await axios.post(
-        `${import.meta.env.VITE_SERVER}appointment/get-Doctor`,
+        `${import.meta.env.VITE_SERVER}api/appointment/get-Doctor`,
         { specialization },
         {
           headers: {
@@ -74,11 +74,11 @@ function BookAppointment() {
   // Handle doctor selection
   const handleDoctorSelect = (doctor) => {
     setSelectedDoctor(doctor);
-    
+
     if (selectedDate) {
       fetchAvailableTimeSlots(doctor._id, selectedDate);
     }
-    
+
     setStep(3);
   };
 
@@ -87,7 +87,7 @@ function BookAppointment() {
     const date = e.target.value;
     setSelectedDate(date);
     setSelectedTime("");
-    
+
     if (date && selectedDoctor) {
       await fetchAvailableTimeSlots(selectedDoctor._id, date);
     }
@@ -123,9 +123,9 @@ function BookAppointment() {
 
       // Parse the time properly
       // console.log("selectedTime", selectedTime);
-      
+
       const { data } = await axios.post(
-        `${import.meta.env.VITE_SERVER}appointment/create-appointment`,
+        `${import.meta.env.VITE_SERVER}api/appointment/create-appointment`,
         {
           doctor: selectedDoctor._id,
           date: selectedDate,
@@ -167,10 +167,10 @@ function BookAppointment() {
     try {
       setFetchingTimeSlots(true);
       const { data } = await axios.post(
-        `${import.meta.env.VITE_SERVER}appointment/get-available-timeslots`,
-        { 
+        `${import.meta.env.VITE_SERVER}api/appointment/get-available-timeslots`,
+        {
           doctorId,
-          date 
+          date,
         },
         {
           headers: {
@@ -197,22 +197,22 @@ function BookAppointment() {
   // Add this function after your existing functions
   const formatTimeTo12Hour = (time) => {
     if (!time) return "";
-    
+
     // If the time is already in 12-hour format, return it as is
-    if (time.includes('AM') || time.includes('PM')) {
+    if (time.includes("AM") || time.includes("PM")) {
       return time;
     }
-    
+
     // Parse the time (assuming format is HH:MM or HH:MM:SS)
-    const timeParts = time.split(':');
+    const timeParts = time.split(":");
     let hours = parseInt(timeParts[0], 10);
     const minutes = timeParts[1];
-    
+
     // Determine AM/PM and convert hours
-    const period = hours >= 12 ? 'PM' : 'AM';
+    const period = hours >= 12 ? "PM" : "AM";
     hours = hours % 12;
     hours = hours ? hours : 12; // Convert 0 to 12 for 12 AM
-    
+
     // Format with leading zero for minutes
     return `${hours}:${minutes} ${period}`;
   };
@@ -401,7 +401,9 @@ function BookAppointment() {
                     </div>
                   ) : (
                     <div className="text-center py-4 border border-gray-200 rounded-lg">
-                      <p className="text-gray-500">No available time slots for this date</p>
+                      <p className="text-gray-500">
+                        No available time slots for this date
+                      </p>
                     </div>
                   )
                 ) : (
@@ -471,7 +473,7 @@ function BookAppointment() {
               Book Another Appointment
             </button>
             <button
-              onClick={() => (window.location.href = "/userdashboard")}
+              onClick={() => (window.location.href = "/dashboard")}
               className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-6 rounded-lg transition-colors"
             >
               Go to My Appointments

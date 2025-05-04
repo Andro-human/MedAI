@@ -23,7 +23,7 @@ const Login = () => {
     setLoading(true);
     try {
       const { data } = await axios.post(
-        `${import.meta.env.VITE_SERVER}auth/login`,
+        `${import.meta.env.VITE_SERVER}api/auth/login`,
         { role, email, password }
       );
 

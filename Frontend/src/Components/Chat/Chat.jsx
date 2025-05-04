@@ -9,6 +9,8 @@ import {
   FaEllipsisV,
   FaCalendarAlt,
 } from "react-icons/fa";
+import { Socket } from "socket.io-client";
+import { GetSocket } from "../../socket";
 
 function Chat() {
   const { user } = useSelector((state) => state.auth);
@@ -19,104 +21,27 @@ function Chat() {
   const [loading, setLoading] = useState(false);
   const [conversationsLoading, setConversationsLoading] = useState(false);
   const messageEndRef = useRef(null);
+  const socket = GetSocket();
 
-  // Sample data for testing - remove when connecting to real API
-  const sampleConversations = [
-    {
-      _id: "conv1",
-      participants: [
-        { _id: user?._id || "user1", name: "Current User", role: "user" },
-        { _id: "doc1", name: "John Smith", role: "doctor" },
-      ],
-      lastMessage: {
-        content: "When should I take the medication?",
-        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-        sender: user?._id || "user1",
-      },
-    },
-    {
-      _id: "conv2",
-      participants: [
-        { _id: user?._id || "user1", name: "Current User", role: "user" },
-        { _id: "doc2", name: "Sarah Johnson", role: "doctor" },
-      ],
-      lastMessage: {
-        content:
-          "Your test results look normal, but we should schedule a follow-up appointment.",
-        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
-        sender: "doc2",
-      },
-    },
-  ];
-
-  const sampleMessages = {
-    conv1: [
-      {
-        _id: "msg1",
-        conversationId: "conv1",
-        content: "Hello, Dr. Smith. I have a question about my prescription.",
-        createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
-        sender: user?._id || "user1",
-      },
-      {
-        _id: "msg2",
-        conversationId: "conv1",
-        content: "Hello there. What would you like to know?",
-        createdAt: new Date(Date.now() - 2.5 * 60 * 60 * 1000).toISOString(), // 2.5 hours ago
-        sender: "doc1",
-      },
-      {
-        _id: "msg3",
-        conversationId: "conv1",
-        content: "When should I take the medication?",
-        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-        sender: user?._id || "user1",
-      },
-    ],
-    conv2: [
-      {
-        _id: "msg4",
-        conversationId: "conv2",
-        content:
-          "Good morning Dr. Johnson. Just checking in about my recent lab work.",
-        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
-        sender: user?._id || "user1",
-      },
-      {
-        _id: "msg5",
-        conversationId: "conv2",
-        content:
-          "Good morning. I've reviewed your results and everything looks within normal ranges.",
-        createdAt: new Date(
-          Date.now() - 1.5 * 24 * 60 * 60 * 1000
-        ).toISOString(), // 1.5 days ago
-        sender: "doc2",
-      },
-      {
-        _id: "msg6",
-        conversationId: "conv2",
-        content:
-          "That's good to hear! Is there anything else I should be monitoring?",
-        createdAt: new Date(
-          Date.now() - 1.2 * 24 * 60 * 60 * 1000
-        ).toISOString(), // 1.2 days ago
-        sender: user?._id || "user1",
-      },
-      {
-        _id: "msg7",
-        conversationId: "conv2",
-        content:
-          "Your test results look normal, but we should schedule a follow-up appointment.",
-        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
-        sender: "doc2",
-      },
-    ],
+  const newMessageListener = (message) => {
+    console.log("newMessage", message);
+    console.log("selectedConversation", selectedConversation);
+    if (message.conversationId === selectedConversation?._id) {
+      setMessages((prevMessages) => [...prevMessages, message?.message]);
+    }
   };
 
   // Fetch user's conversations
   useEffect(() => {
     fetchConversations();
   }, []);
+
+  useEffect(() => {
+    socket.on("newMessage", newMessageListener);
+    return () => {
+      socket.off("newMessage", newMessageListener);
+    };
+  });
 
   // Fetch messages when a conversation is selected
   useEffect(() => {
@@ -139,15 +64,13 @@ function Chat() {
       setConversationsLoading(true);
 
       // TEMPORARY: Use sample data until API is connected
-      setConversations(sampleConversations);
-      if (sampleConversations.length > 0 && !selectedConversation) {
-        setSelectedConversation(sampleConversations[0]);
-      }
+      // setConversations(sampleConversations);
+      // if (sampleConversations.length > 0 && !selectedConversation) {
+      //   setSelectedConversation(sampleConversations[0]);
+      // }
 
-      // UNCOMMENT when API is ready:
-      /*
       const { data } = await axios.get(
-        `${import.meta.env.VITE_SERVER}chat/conversations`,
+        `${import.meta.env.VITE_SERVER}api/conversations/my`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -156,15 +79,14 @@ function Chat() {
       );
 
       if (data.success) {
-        setConversations(data.conversations);
+        setConversations(data.conversation);
         // Auto-select the first conversation if none is selected
-        if (data.conversations.length > 0 && !selectedConversation) {
-          setSelectedConversation(data.conversations[0]);
+        if (data.conversation.length > 0 && !selectedConversation) {
+          setSelectedConversation(data.conversation[0]);
         }
       } else {
         toast.error(data.message || "Failed to fetch conversations");
       }
-      */
     } catch (error) {
       console.error(error);
       toast.error("Error fetching conversations");
@@ -178,12 +100,10 @@ function Chat() {
       setLoading(true);
 
       // TEMPORARY: Use sample data until API is connected
-      setMessages(sampleMessages[conversationId] || []);
+      // setMessages(sampleMessages[conversationId] || []);
 
-      // UNCOMMENT when API is ready:
-      /*
       const { data } = await axios.get(
-        `${import.meta.env.VITE_SERVER}chat/messages/${conversationId}`,
+        `${import.meta.env.VITE_SERVER}api/messages/${conversationId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -196,7 +116,6 @@ function Chat() {
       } else {
         toast.error(data.message || "Failed to fetch messages");
       }
-      */
     } catch (error) {
       console.error(error);
       toast.error("Error fetching messages");
@@ -208,57 +127,13 @@ function Chat() {
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !selectedConversation) return;
-
     // Create a temporary message ID
-    const tempId = `temp-${Date.now()}`;
-
-    // Create the new message object with current timestamp
-    const newMsg = {
-      _id: tempId,
-      conversationId: selectedConversation._id,
-      content: newMessage,
-      createdAt: new Date().toISOString(),
-      sender: user?._id || "user1", // Fallback for sample data
-    };
-
-    // Optimistically add message to UI
-    setMessages([...messages, newMsg]);
+    socket.emit("sendMessage", {
+      conversationId: selectedConversation?._id,
+      members: [selectedConversation?.members, user?._id],
+      message: newMessage,
+    });
     setNewMessage("");
-
-    try {
-      // UNCOMMENT when API is ready:
-      /*
-      const { data } = await axios.post(
-        `${import.meta.env.VITE_SERVER}chat/messages`,
-        {
-          conversationId: selectedConversation._id,
-          content: newMessage,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      if (data.success) {
-        // Replace temp message with real one from server
-        const updatedMessages = messages.map(msg => 
-          msg._id === tempId ? data.message : msg
-        );
-        setMessages(updatedMessages);
-      } else {
-        toast.error(data.message || "Failed to send message");
-        // Remove the temp message if failed
-        setMessages(messages.filter(msg => msg._id !== tempId));
-      }
-      */
-    } catch (error) {
-      console.error(error);
-      toast.error("Error sending message");
-      // Remove the temp message if failed
-      setMessages(messages.filter((msg) => msg._id !== tempId));
-    }
   };
 
   const formatTime = (dateString) => {
@@ -284,24 +159,9 @@ function Chat() {
   const getConversationName = (conversation) => {
     if (!conversation) return "";
 
-    const otherPerson = conversation.participants.find(
-      (p) => p._id !== (user?._id || "user1") // Fallback for sample data
-    );
+    const otherPerson = conversation.name;
 
-    return otherPerson
-      ? otherPerson.role === "doctor"
-        ? `Dr. ${otherPerson.name}`
-        : otherPerson.name
-      : "Unknown";
-  };
-
-  const getLastMessage = (conversation) => {
-    if (!conversation || !conversation.lastMessage) {
-      return "No messages yet";
-    }
-    return conversation.lastMessage.content.length > 25
-      ? conversation.lastMessage.content.substring(0, 25) + "..."
-      : conversation.lastMessage.content;
+    return user?.role === "user" ? `Dr. ${otherPerson}` : otherPerson;
   };
 
   const renderConversationList = () => (
@@ -320,7 +180,7 @@ function Chat() {
           <p className="text-gray-500 mb-4">No conversations yet</p>
           <button
             className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-            onClick={() => (window.location.href = "/userdashboard")}
+            onClick={() => (window.location.href = "/dashboard")}
           >
             <FaCalendarAlt className="inline mr-2" />
             View your appointments
@@ -340,9 +200,7 @@ function Chat() {
             >
               <div className="flex items-center">
                 <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                  {conversation.participants.find(
-                    (p) => p._id !== (user?._id || "user1")
-                  )?.role === "doctor" ? (
+                  {user?.role === "doctor" ? (
                     <FaUserMd className="text-blue-600 text-xl" />
                   ) : (
                     <FaUser className="text-blue-600 text-xl" />
@@ -353,15 +211,15 @@ function Chat() {
                     <h3 className="font-medium text-gray-900 truncate">
                       {getConversationName(conversation)}
                     </h3>
-                    <span className="text-xs text-gray-500">
+                    {/* <span className="text-xs text-gray-500">
                       {conversation.lastMessage
                         ? formatDate(conversation.lastMessage.createdAt)
                         : ""}
-                    </span>
+                    </span> */}
                   </div>
-                  <p className="text-sm text-gray-500 truncate">
+                  {/* <p className="text-sm text-gray-500 truncate">
                     {getLastMessage(conversation)}
-                  </p>
+                  </p> */}
                 </div>
               </div>
             </div>
@@ -378,9 +236,7 @@ function Chat() {
           <div className="p-4 border-b border-gray-200 flex justify-between items-center">
             <div className="flex items-center">
               <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                {selectedConversation.participants.find(
-                  (p) => p._id !== (user?._id || "user1")
-                )?.role === "doctor" ? (
+                {user?.role === "user" ? (
                   <FaUserMd className="text-blue-600" />
                 ) : (
                   <FaUser className="text-blue-600" />
@@ -391,11 +247,7 @@ function Chat() {
                   {getConversationName(selectedConversation)}
                 </h3>
                 <p className="text-xs text-gray-500">
-                  {selectedConversation.participants.find(
-                    (p) => p._id !== (user?._id || "user1")
-                  )?.role === "doctor"
-                    ? "Doctor"
-                    : "Patient"}
+                  {user?.role === "user" ? "Doctor" : "Patient"}
                 </p>
               </div>
             </div>
@@ -422,7 +274,7 @@ function Chat() {
             ) : (
               <div className="space-y-3">
                 {messages.map((message, index) => {
-                  const isSender = message.sender === (user?._id || "user1"); // Fallback for sample data
+                  const isSender = message.senderId._id === user?._id; // Fallback for sample data
                   const showDate =
                     index === 0 ||
                     new Date(message.createdAt).toDateString() !==
@@ -449,7 +301,7 @@ function Chat() {
                               : "bg-gray-200 text-gray-800 rounded-bl-none"
                           }`}
                         >
-                          <p className="text-sm">{message.content}</p>
+                          <p className="text-sm">{message?.message}</p>
                           <p
                             className={`text-xs mt-1 text-right ${
                               isSender ? "text-blue-100" : "text-gray-500"
