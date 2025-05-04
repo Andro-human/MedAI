@@ -17,9 +17,7 @@ const userSocketIDs = new Map();
 
 const corsOptions = {
   origin: [
-    "http://localhost:5173",
-    // "https://chat-app.animeshsinha.info",
-    // "https://chat-app.animeshsinha.dev",
+    process.env.FRONTEND_URL,
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
