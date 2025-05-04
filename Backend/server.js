@@ -18,6 +18,7 @@ const userSocketIDs = new Map();
 const corsOptions = {
   origin: [
     process.env.FRONTEND_URL,
+    "https://medai-backend-kmqb.onrender.com/",
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
