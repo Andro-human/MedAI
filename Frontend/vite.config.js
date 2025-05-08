@@ -5,7 +5,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [react()],
     server: {
-      host: '192.168.1.14', // allows access from local network
+      host: '0.0.0.0', // allows access from local network
       port: 5173,      // or any port you prefer
     }
 })

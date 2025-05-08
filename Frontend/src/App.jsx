@@ -17,13 +17,15 @@ import Contact from "./pages/Contact.jsx";
 import BookAppointment from "./pages/Dashboard/BookAppointment.jsx";
 import Userdashboard from "./pages/Dashboard/Userdashboard.jsx";
 import Herosection from "./pages/Herosection.jsx";
+import LobbyScreen from "./pages/Lobby.jsx";
 import Services from "./pages/Services.jsx";
 import Analytics from "./pages/admin/Analytics.jsx";
 import AdminAppointments from "./pages/admin/Appointments.jsx";
 import Doctors from "./pages/admin/Doctors.jsx";
 import Patients from "./pages/admin/Patients.jsx";
-import LobbyScreen from "./pages/Lobby.jsx";
+import ReportPage from "./pages/report.jsx";
 import Room from "./pages/room.jsx";
+import ImageUploadPage from "./pages/woundAnalyser.jsx";
 import { userExists, userNotExists } from "./redux/reducers/auth";
 
 function App() {
@@ -71,17 +73,19 @@ function App() {
           <Route path="/room/:roomId" element={<Room />} />
           <Route path="/Login" element={<Login />} />
           <Route path="/Signup" element={<Signup />} />
+          <Route
+            path="/Services"
+            element={
+              <>
+                <Services />
+                <Footer />
+              </>
+            }
+          />
+          <Route path="/Services/wound" element={<ImageUploadPage />} />
+          <Route path="/Services/report" element={<ReportPage />} />
         </Route>
 
-        <Route
-          path="/Services"
-          element={
-            <>
-              <Services />
-              <Footer />
-            </>
-          }
-        />
         <Route
           path="/Contact"
           element={
