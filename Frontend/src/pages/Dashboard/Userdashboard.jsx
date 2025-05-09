@@ -46,7 +46,7 @@ function Userdashboard() {
   const fetchDoctorAppointments = async () => {
     try {
       const { data } = await axios.get(
-        `${import.meta.env.VITE_SERVER}appointment/get-doctor-appointment`,
+        `${import.meta.env.VITE_SERVER}api/appointment/get-doctor-appointment`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -68,7 +68,7 @@ function Userdashboard() {
     try {
       setLoading(true);
       const { data } = await axios.get(
-        `${import.meta.env.VITE_SERVER}appointment/get-patient-appointment`,
+        `${import.meta.env.VITE_SERVER}api/appointment/get-patient-appointment`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -153,7 +153,7 @@ function Userdashboard() {
           onClick: async () => {
             try {
               const { data } = await axios.post(
-                `${import.meta.env.VITE_SERVER}appointment/cancel-appointment/`,
+                `${import.meta.env.VITE_SERVER}api/appointment/cancel-appointment/`,
                 {
                   appointmentId,
                 },
@@ -471,15 +471,7 @@ function Userdashboard() {
                             </div>
                             <div className="mt-4 md:mt-0">
                               <button
-                                onClick={() =>
-                                  navigate(
-                                    `/chat/${
-                                      user?.role === "user"
-                                        ? appointment.doctor._id
-                                        : appointment.patient._id
-                                    }`
-                                  )
-                                }
+                                onClick={() => navigate(`/chat/`)}
                                 className="bg-white border border-blue-500 text-blue-600 py-2 px-4 rounded-lg text-sm transition-colors hover:bg-blue-50"
                               >
                                 Chat with{" "}

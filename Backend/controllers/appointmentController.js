@@ -1,5 +1,6 @@
 const appointmentModel = require("../models/appointmentModel");
 const userModel = require("../models/userModel");
+const conversationModel = require("../models/conversationModel");
 
 // Available timeslots
 const AVAILABLE_TIMESLOTS = [
@@ -53,8 +54,8 @@ const isDoctorAvailable = async (doctorId, date, time) => {
 const createAppointmentController = async (req, res) => {
   try {
     const { doctor, userId, date, time } = req.body;
-    console.log("print", req.body);
-    console.log("available timeslots", AVAILABLE_TIMESLOTS);
+    "print", req.body;
+    "available timeslots", AVAILABLE_TIMESLOTS;
 
     // Validate the time against available timeslots
     if (!AVAILABLE_TIMESLOTS.includes(time)) {
@@ -120,6 +121,24 @@ const createAppointmentController = async (req, res) => {
       timeslot: time,
     });
 
+    "doctor", doctor;
+    "userId", userId;
+
+    const existingConversation = await conversationModel.findOne({
+      members: { $all: [doctor, userId] },
+    });
+
+    if (!existingConversation) {
+      "doctor", doctor;
+      "userId", userId;
+      conversation = new conversationModel({
+        name: `${doctorData.name} and ${patientData.name}`,
+        members: [doctor, userId],
+      });
+      await conversation.save();
+      "conversation", conversation;
+    }
+
     await appointment.save();
 
     return res.status(201).send({
@@ -127,7 +146,7 @@ const createAppointmentController = async (req, res) => {
       message: "New appointment created",
     });
   } catch (error) {
-    console.log(error);
+    error;
     res.status(500).send({
       success: false,
       message: "Error in Appointment API",
@@ -175,7 +194,7 @@ const getAvailableTimeslotsController = async (req, res) => {
       availableTimeslots,
     });
   } catch (error) {
-    console.log(error);
+    error;
     res.status(500).send({
       success: false,
       message: "Error in getAvailableTimeslots API",
@@ -199,7 +218,7 @@ const getPatientAppointmentController = async (req, res) => {
       appointments,
     });
   } catch (error) {
-    console.log(error);
+    error;
     res.status(500).send({
       success: false,
       message: "Error in getPatientAppointment API",
@@ -222,7 +241,7 @@ const getDoctorAppointmentController = async (req, res) => {
       appointments,
     });
   } catch (error) {
-    console.log(error);
+    error;
     res.status(500).send({
       success: false,
       message: "Error in getDoctorAppointment API",
@@ -250,7 +269,7 @@ const getDoctorController = async (req, res) => {
       doctors: doctors,
     });
   } catch (error) {
-    console.log(error);
+    error;
     res.status(500).send({
       success: false,
       message: "Error in getDoctor API",
@@ -268,7 +287,7 @@ const getDoctorController = async (req, res) => {
 //       timeslots: AVAILABLE_TIMESLOTS,
 //     });
 //   } catch (error) {
-//     console.log(error);
+//     (error);
 //     res.status(500).send({
 //       success: false,
 //       message: "Error in getAllTimeslots API",
@@ -349,7 +368,7 @@ const rescheduleAppointmentController = async (req, res) => {
       message: "Appointment rescheduled successfully",
     });
   } catch (error) {
-    console.log(error);
+    error;
     res.status(500).send({
       success: false,
       message: "Error in rescheduleAppointment API",
@@ -394,7 +413,7 @@ const cancelAppointmentController = async (req, res) => {
       message: "Appointment canceled successfully",
     });
   } catch (error) {
-    console.log(error);
+    error;
     res.status(500).send({
       success: false,
       message: "Error in cancelAppointment API",

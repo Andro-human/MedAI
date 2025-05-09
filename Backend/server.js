@@ -6,6 +6,8 @@ const connectDB = require("./config/db");
 const { Server } = require("socket.io");
 const socketAuth = require("./middlewares/socketAuth");
 const { createServer } = require("http");
+const { v4: uuid } = require("uuid");
+const messageModel = require("./models/messageModel");
 
 const app = express();
 dotenv.config();
@@ -15,9 +17,8 @@ const userSocketIDs = new Map();
 
 const corsOptions = {
   origin: [
-    "http://localhost:5173",
-    "https://chat-app.animeshsinha.info",
-    "https://chat-app.animeshsinha.dev",
+    process.env.FRONTEND_URL,
+    "https://med-ai.animeshsinha.dev",
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
@@ -40,19 +41,16 @@ app.use(morgan("dev"));
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/appointment", require("./routes/appointmentRoutes"));
+app.use("/api/conversations", require("./routes/conversationRoutes"));
+app.use("/api/messages", require("./routes/messageRoutes"));
 
 io.use((socket, next) => {
-  socket.request,
-    socket.request.res,
-    async (err) => {
-      await socketAuth(err, socket, next);
-    };
-  // next();
+  socketAuth(null, socket, next); // 'err' is null by default here
 });
 
 io.on("connection", (socket) => {
   const user = socket.user;
-  // console.log("A user Connected", user);
+  "A user Connected", user;
   userSocketIDs.set(user._id.toString(), socket.id);
 
   io.emit("onlineUsers", { userIDs: Array.from(userSocketIDs.keys()) });
@@ -70,11 +68,8 @@ io.on("connection", (socket) => {
       senderId: user._id,
       conversationId,
     };
-
-    // console.log("New message:", members);
     // Emit event to all members of the conversation
     const memberSocket = members.map((member) => userSocketIDs.get(member));
-
     io.to(memberSocket).emit("newMessage", {
       conversationId,
       message: newMessage,
@@ -87,17 +82,8 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("typing", ({ conversationId, members }) => {
-    const memberSocket = members.map((member) => userSocketIDs.get(member));
-    socket.to(memberSocket).emit("typing", { conversationId });
-  });
-  socket.on("stopTyping", ({ conversationId, members }) => {
-    const memberSocket = members.map((member) => userSocketIDs.get(member));
-    socket.to(memberSocket).emit("stopTyping", { conversationId });
-  });
-
   socket.on("disconnect", () => {
-    // console.log("A user disconnected");
+    // ("A user disconnected");
     userSocketIDs.delete(user._id.toString());
     io.emit("onlineUsers", { userIDs: Array.from(userSocketIDs.keys()) });
   });
@@ -137,6 +123,6 @@ io.on("connection", (socket) => {
 
 const PORT = process.env.PORT || 8080;
 
-app.listen(PORT, () => {
-  console.log(`The server is running on PORT: ${PORT}`);
+server.listen(PORT, () => {
+  `The server is running on PORT: ${PORT}`;
 });

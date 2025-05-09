@@ -18,7 +18,7 @@ const getAllDoctors = async (req, res) => {
       doctors,
     });
   } catch (error) {
-    console.log(error);
+    error;
     return res.status(500).send({
       success: false,
       message: "Error in getAllDoctors API",
@@ -43,7 +43,7 @@ const getAllUsers = async (req, res) => {
       users,
     });
   } catch (error) {
-    console.log(error);
+    error;
     return res.status(500).send({
       success: false,
       message: "Error in getAllUsers API",
@@ -73,7 +73,7 @@ const getAllAppointments = async (req, res) => {
       appointments,
     });
   } catch (error) {
-    console.log(error);
+    error;
     return res.status(500).send({
       success: false,
       message: "Error in getAllAppointments API",
@@ -99,7 +99,7 @@ const deleteUser = async (req, res) => {
       message: "User deleted successfully",
     });
   } catch (error) {
-    console.log(error);
+    error;
     return res.status(500).send({
       success: false,
       message: "Error in deleteUser API",
@@ -204,7 +204,7 @@ const getAnalytics = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error);
+    error;
     return res.status(500).send({
       success: false,
       message: "Error in getCompleteAnalytics API",

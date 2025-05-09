@@ -17,7 +17,7 @@ function Contact() {
   const handleSubmit = (e) => {
     e.preventDefault();
     // You can handle form submission logic here
-    console.log(formData);
+    formData;
     // Reset the form after submission
     setFormData({ name: "", email: "", query: "" });
   };

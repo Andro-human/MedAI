@@ -23,10 +23,12 @@ import Analytics from "./pages/admin/Analytics.jsx";
 import AdminAppointments from "./pages/admin/Appointments.jsx";
 import Doctors from "./pages/admin/Doctors.jsx";
 import Patients from "./pages/admin/Patients.jsx";
+import { SocketProvider } from "./socket.jsx";
 import ReportPage from "./pages/report.jsx";
 import Room from "./pages/room.jsx";
 import ImageUploadPage from "./pages/woundAnalyser.jsx";
 import { userExists, userNotExists } from "./redux/reducers/auth";
+
 
 function App() {
   const { user, isLoading } = useSelector((state) => state.auth);
@@ -34,13 +36,12 @@ function App() {
 
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_SERVER}auth/getUser`, {
+      .get(`${import.meta.env.VITE_SERVER}api/auth/getUser`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
       .then(({ data }) => {
-        console.log(data);
         dispatch(userExists(data.user));
       })
       .catch(() => {
@@ -48,7 +49,6 @@ function App() {
         localStorage.clear();
       });
   }, [dispatch]);
-  console.log("user", user);
 
   return isLoading ? (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -96,11 +96,19 @@ function App() {
           }
         />
 
-        <Route element={<ProtectedRoutes user={user} />}>
+        <Route
+          element={
+            <SocketProvider>
+              <ProtectedRoutes user={user} />{" "}
+            </SocketProvider>
+          }
+        >
           <Route path="/analytics" element={<Analytics />} />
-          <Route path="/dashboard" element={<Userdashboard  />} />
+          <Route path="/dashboard" element={<Userdashboard />} />
           <Route path="/book-appointment" element={<BookAppointment />} />
+
           <Route path="/chat" element={<Chat />} />
+
           <Route path="/appointments" element={<AdminAppointments />} />
           <Route path="/doctors" element={<Doctors />} />
           <Route path="/patients" element={<Patients />} />

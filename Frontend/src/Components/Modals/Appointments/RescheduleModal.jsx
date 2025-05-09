@@ -10,7 +10,7 @@ const RescheduleModal = ({ isOpen, onClose, appointment, onReschedule }) => {
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
   const [fetchingTimeSlots, setFetchingTimeSlots] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
   useEffect(() => {
     // Reset the form when modal opens
     if (isOpen) {
@@ -25,7 +25,7 @@ const RescheduleModal = ({ isOpen, onClose, appointment, onReschedule }) => {
     const date = e.target.value;
     setSelectedDate(date);
     setSelectedTime("");
-    
+
     if (date) {
       await fetchAvailableTimeSlots(date);
     }
@@ -38,14 +38,15 @@ const RescheduleModal = ({ isOpen, onClose, appointment, onReschedule }) => {
 
   // Fetch available time slots
   const fetchAvailableTimeSlots = async (date) => {
-    const doctorId = user?.role === "user" ? appointment?.doctor?._id : appointment?.doctor;
+    const doctorId =
+      user?.role === "user" ? appointment?.doctor?._id : appointment?.doctor;
     try {
       setFetchingTimeSlots(true);
       const { data } = await axios.post(
-        `${import.meta.env.VITE_SERVER}appointment/get-available-timeslots`,
-        { 
+        `${import.meta.env.VITE_SERVER}api/appointment/get-available-timeslots`,
+        {
           doctorId,
-          date 
+          date,
         },
         {
           headers: {
@@ -53,7 +54,7 @@ const RescheduleModal = ({ isOpen, onClose, appointment, onReschedule }) => {
           },
         }
       );
-      
+
       if (data.success) {
         setAvailableTimeSlots(data.availableTimeslots || []);
       } else {
@@ -72,19 +73,19 @@ const RescheduleModal = ({ isOpen, onClose, appointment, onReschedule }) => {
   // Format time to 12-hour format
   const formatTimeTo12Hour = (time) => {
     if (!time) return "";
-    
-    if (time.includes('AM') || time.includes('PM')) {
+
+    if (time.includes("AM") || time.includes("PM")) {
       return time;
     }
-    
-    const timeParts = time.split(':');
+
+    const timeParts = time.split(":");
     let hours = parseInt(timeParts[0], 10);
     const minutes = timeParts[1];
-    
-    const period = hours >= 12 ? 'PM' : 'AM';
+
+    const period = hours >= 12 ? "PM" : "AM";
     hours = hours % 12;
     hours = hours ? hours : 12;
-    
+
     return `${hours}:${minutes} ${period}`;
   };
 
@@ -110,9 +111,9 @@ const RescheduleModal = ({ isOpen, onClose, appointment, onReschedule }) => {
 
     try {
       setLoading(true);
-      
+
       const { data } = await axios.post(
-        `${import.meta.env.VITE_SERVER}appointment/reschedule-appointment`,
+        `${import.meta.env.VITE_SERVER}api/appointment/reschedule-appointment`,
         {
           appointmentId: appointment._id,
           date: selectedDate,
@@ -134,7 +135,9 @@ const RescheduleModal = ({ isOpen, onClose, appointment, onReschedule }) => {
       }
     } catch (error) {
       console.error(error);
-      toast.error(error.response?.data?.message || "Error rescheduling appointment");
+      toast.error(
+        error.response?.data?.message || "Error rescheduling appointment"
+      );
     } finally {
       setLoading(false);
     }
@@ -159,10 +162,18 @@ const RescheduleModal = ({ isOpen, onClose, appointment, onReschedule }) => {
 
         <div className="mb-6">
           <div className="flex items-center mb-2">
-            <h3 className="font-medium">{user?.role === "user" ? "Patient. " + appointment?.doctorName : (user?.role === "doctor" ? "Dr. " + appointment?.patientName : "Patient. " + appointment?.patient?.name)}</h3>
+            <h3 className="font-medium">
+              {user?.role === "user"
+                ? "Patient. " + appointment?.doctorName
+                : user?.role === "doctor"
+                ? "Dr. " + appointment?.patientName
+                : "Patient. " + appointment?.patient?.name}
+            </h3>
           </div>
           <p className="text-sm text-gray-600">
-            Current appointment: {new Date(appointment?.date).toLocaleDateString()} at {appointment?.timeslot}
+            Current appointment:{" "}
+            {new Date(appointment?.date).toLocaleDateString()} at{" "}
+            {appointment?.timeslot}
           </p>
         </div>
 
@@ -215,7 +226,9 @@ const RescheduleModal = ({ isOpen, onClose, appointment, onReschedule }) => {
                 </div>
               ) : (
                 <div className="text-center py-4 border border-gray-200 rounded-lg">
-                  <p className="text-gray-500">No available time slots for this date</p>
+                  <p className="text-gray-500">
+                    No available time slots for this date
+                  </p>
                 </div>
               )
             ) : (
@@ -253,4 +266,4 @@ const RescheduleModal = ({ isOpen, onClose, appointment, onReschedule }) => {
   );
 };
 
-export default RescheduleModal; 
+export default RescheduleModal;

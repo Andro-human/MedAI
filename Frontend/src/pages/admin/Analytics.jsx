@@ -102,7 +102,7 @@ function Analytics() {
       setLoading(true);
       try {
         const { data } = await axios.get(
-          `${import.meta.env.VITE_SERVER}admin/get-analytics`,
+          `${import.meta.env.VITE_SERVER}api/admin/get-analytics`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -110,7 +110,7 @@ function Analytics() {
           }
         );
 
-        console.log("data", data);
+        "data", data;
         if (data.success) {
           const appointmentTrendArray = transformAppointmentTrend(
             data?.analytics?.appointmentTrends

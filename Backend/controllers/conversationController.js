@@ -1,33 +1,30 @@
 const conversationModel = require("../models/conversationModel");
 const messageModel = require("../models/messageModel");
 const userModel = require("../models/userModel");
-const { emitEvent } = require("../utils/features");
+// const { emitEvent } = require("../utils/features");
 
 const getMyConversations = async (req, res) => {
   try {
-    const userId = req.userId;
-
+    const userId = req.body.userId;
+    "userId", userId;
     const conversations = await conversationModel
       .find({
         members: { $in: [userId] },
       })
-      .populate("members", "name avatar");
-      
-    const transformedConversations = conversations.map(
-      ({ _id, members }) => {
-          //  console.log("members", members);
-        const otherMember = members.filter(
-          (member) => member._id.toString() !== userId.toString()
-        );
+      .populate("members", "name");
 
-        return {
-          _id,
-          name: otherMember[0].name,
-          avatar: otherMember[0].avatar.url,
-          members: otherMember[0].id,
-        };
-      }
-    );
+    const transformedConversations = conversations.map(({ _id, members }) => {
+      //  ("members", members);
+      const otherMember = members.filter(
+        (member) => member._id.toString() !== userId.toString()
+      );
+
+      return {
+        _id,
+        name: otherMember[0].name,
+        members: otherMember[0].id,
+      };
+    });
 
     return res.status(200).json({
       success: true,
@@ -35,7 +32,7 @@ const getMyConversations = async (req, res) => {
       conversation: transformedConversations,
     });
   } catch (error) {
-    console.log(error);
+    error;
     res.status(500).json({
       success: false,
       message: "Error in getMyConversations API",
@@ -48,7 +45,7 @@ const getConversationDetails = async (req, res) => {
   try {
     const { id: conversationId } = req.params;
     // const senderId = req.userId;
-    
+
     if (req.query.populate === "true") {
       const conversation = await conversationModel
         .findById(conversationId)
@@ -92,7 +89,7 @@ const getConversationDetails = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    error;
     res.status(500).json({
       success: false,
       message: "Error in fetching conversation details",
@@ -107,7 +104,7 @@ const createConversation = async (req, res) => {
     const senderId = req.userId;
 
     const conversationExists = await conversationModel.findOne({
-      members: { $all: [senderId, otherMemberId] }, 
+      members: { $all: [senderId, otherMemberId] },
     });
 
     if (conversationExists) {
@@ -117,7 +114,7 @@ const createConversation = async (req, res) => {
         conversation: conversationExists,
       });
     }
-    
+
     const currentUser = await userModel.findById(senderId).select("name");
     const otherMember = await userModel.findById(otherMemberId).select("name");
 
@@ -130,24 +127,24 @@ const createConversation = async (req, res) => {
 
     const conversation = await conversationModel.create({
       name: `${otherMember.name} - ${currentUser.name}`,
-      members: [senderId, otherMemberId],    
+      members: [senderId, otherMemberId],
     });
 
-    emitEvent(req, "refetchChats");
+    // emitEvent(req, "refetchChats");
     return res.status(201).json({
       success: true,
       message: "Conversation created successfully",
       conversation,
     });
   } catch (error) {
-    console.log(error);
+    error;
     res.status(500).json({
       success: false,
       message: "Error in createConversation API",
       error,
     });
   }
-}
+};
 
 const deleteConversation = async (req, res) => {
   try {
@@ -175,15 +172,14 @@ const deleteConversation = async (req, res) => {
       conversationModel.findByIdAndDelete(id),
     ]);
 
-    emitEvent(req, "refetchChats");
-     
+    // emitEvent(req, "refetchChats");
 
     return res.status(200).json({
       success: true,
       message: "Conversation deleted successfully",
     });
   } catch (error) {
-    console.log(error);
+    error;
     res.status(500).json({
       success: false,
       message: "Error in deleteChat API",
@@ -192,8 +188,9 @@ const deleteConversation = async (req, res) => {
   }
 };
 
-
-
-
-
-module.exports = { getMyConversations, getConversationDetails, deleteConversation, createConversation };
+module.exports = {
+  getMyConversations,
+  getConversationDetails,
+  deleteConversation,
+  createConversation,
+};

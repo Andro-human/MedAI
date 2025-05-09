@@ -41,7 +41,7 @@ function Appointments() {
     try {
       setLoading(true);
       const { data } = await axios.get(
-        `${import.meta.env.VITE_SERVER}admin/getAllAppointments`,
+        `${import.meta.env.VITE_SERVER}api/admin/getAllAppointments`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -117,7 +117,9 @@ function Appointments() {
           onClick: async () => {
             try {
               const { data } = await axios.post(
-                `${import.meta.env.VITE_SERVER}appointment/cancel-appointment/`,
+                `${
+                  import.meta.env.VITE_SERVER
+                }api/appointment/cancel-appointment/`,
                 {
                   appointmentId,
                 },
