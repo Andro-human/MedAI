@@ -38,7 +38,7 @@ const ReportPage = () => {
 
     try {
       console.log('Sending request to server...');
-      const response = await fetch('https://medai-ai-kqw8.onrender.com/api/summeriseReport', {
+      const response = await fetch('http://localhost:8000/api/summeriseReport', {
         method: 'POST',
         body: formData,
       });

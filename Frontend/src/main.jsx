@@ -22,7 +22,7 @@ import "./index.css";
 // import Userdashboard from "./Components/UserDashboard/Userdashboard.jsx";
 import { CssBaseline } from "@mui/material";
 import { Provider } from "react-redux";
-import { SocketProvider } from "./context/SocketProvider.jsx";
+
 import store from "./redux/store.js";
 // import "react-toastify/dist/ReactToastify.css";
 // import { ToastContainer } from "react-toastify";
