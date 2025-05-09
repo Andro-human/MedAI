@@ -42,7 +42,7 @@ function Services() {
             forecast potential health conditions
           </p>
           <button className="w-full bg-blue-900 h-10 text-white rounded-lg hover:bg-blue-500">
-            <a href="https://diseasepredictor-jv71.onrender.com/">Predict</a>
+            <a href="https://diseasepredictor-n6yx.onrender.com/">Predict</a>
           </button>
         </div>
         <div className="w-80 border-solid border-2 rounded-lg shadow-2xl hover:scale-90 duration-200 border-blue-700 p-3 flex flex-col space-y-4 items-center justify-center">
