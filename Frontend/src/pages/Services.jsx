@@ -1,9 +1,19 @@
 import React from "react";
-import wound from "../assets/Services/wound.png";
+import { useNavigate } from "react-router-dom";
 import disease from "../assets/Services/disease.jpg";
 import Report from "../assets/Services/Report.png";
-import { Link } from "react-router-dom";
+import wound from "../assets/Services/wound.png";
 function Services() {
+  const navigate = useNavigate();
+ const handleWoundNavigate = ()=>{
+  navigate('/services/wound');
+};
+
+  const handleDiseaseRoute = ()=>{
+    navigate('/services/report');
+  }
+ 
+
   return (
     <div className="flex flex-col justify-center items-center gap-y-4 h-[80vh]">
       <div className="flex flex-row space-x-12">
@@ -15,8 +25,11 @@ function Services() {
             Wound Analyzer utilizes AI to assess and categorize wound
             characteristics, aiding healthcare providers in treatment planning{" "}
           </p>
-          <button className="w-full bg-blue-900 h-10 text-white rounded-lg hover:bg-blue-500">
-            <a href="https://eca6b6046c522632b8.gradio.live/">Analyse</a>
+          <button 
+            onClick={handleWoundNavigate}
+            className="w-full bg-blue-900 h-10 text-white rounded-lg hover:bg-blue-500 flex items-center justify-center"
+          >
+            Analyse
           </button>
         </div>
         <div className="w-80 border-solid border-2 rounded-lg shadow-2xl hover:scale-90 duration-200 border-blue-700 p-3 flex flex-col space-y-4 items-center justify-center">
@@ -29,7 +42,7 @@ function Services() {
             forecast potential health conditions
           </p>
           <button className="w-full bg-blue-900 h-10 text-white rounded-lg hover:bg-blue-500">
-            <a href="https://black-artist-gusse.pwskills.app:8080/">Predict</a>
+            <a href="https://diseasepredictor-n6yx.onrender.com/">Predict</a>
           </button>
         </div>
         <div className="w-80 border-solid border-2 rounded-lg shadow-2xl hover:scale-90 duration-200 border-blue-700 p-3 flex flex-col space-y-4 items-center justify-center">
@@ -42,7 +55,9 @@ function Services() {
             AI tool condenses medical data into brief summaries, enhancing
             efficiency and clarity in healthcare decision-making.
           </p>
-          <button className="w-full bg-blue-900 h-10 text-white rounded-lg hover:bg-blue-500">
+          <button className="w-full bg-blue-900 h-10 text-white rounded-lg hover:bg-blue-500"
+          onClick={handleDiseaseRoute}
+          >
             Summarizar
           </button>
         </div>

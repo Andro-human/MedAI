@@ -1,28 +1,34 @@
+import axios from "axios";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
-import Navbar from "./Components/Navbar.jsx";
+import Chat from "./Components/Chat/Chat.jsx";
 import Footer from "./Components/Footer.jsx";
-import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
-import Herosection from "./pages/Herosection.jsx";
-import Services from "./pages/Services.jsx";
+import Navbar from "./Components/Navbar.jsx";
+import ProtectedRoutes from "./Routes/ProtectedRoutes.jsx";
+import PublicRoutes from "./Routes/PublicRoutes.jsx";
+import { SocketProvider } from "./context/SocketProvider.jsx";
 import Login from "./pages/Auth/Login.jsx";
 import Signup from "./pages/Auth/Signup.jsx";
 import Contact from "./pages/Contact.jsx";
-import { useSelector, useDispatch } from "react-redux";
-import { userExists, userNotExists } from "./redux/reducers/auth";
-import { useEffect } from "react";
-import axios from "axios";
-import ProtectedRoutes from "./Routes/ProtectedRoutes.jsx";
-import Userdashboard from "./pages/Dashboard/Userdashboard.jsx";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import BookAppointment from "./pages/Dashboard/BookAppointment.jsx";
-import Chat from "./Components/Chat/Chat.jsx";
-import PublicRoutes from "./Routes/PublicRoutes.jsx";
+import Userdashboard from "./pages/Dashboard/Userdashboard.jsx";
+import Herosection from "./pages/Herosection.jsx";
+import LobbyScreen from "./pages/Lobby.jsx";
+import Services from "./pages/Services.jsx";
 import Analytics from "./pages/admin/Analytics.jsx";
 import AdminAppointments from "./pages/admin/Appointments.jsx";
 import Doctors from "./pages/admin/Doctors.jsx";
 import Patients from "./pages/admin/Patients.jsx";
 import { SocketProvider } from "./socket.jsx";
+import ReportPage from "./pages/report.jsx";
+import Room from "./pages/room.jsx";
+import ImageUploadPage from "./pages/woundAnalyser.jsx";
+import { userExists, userNotExists } from "./redux/reducers/auth";
+
 
 function App() {
   const { user, isLoading } = useSelector((state) => state.auth);
@@ -49,6 +55,7 @@ function App() {
       <div className="w-12 h-12 border-t-4 border-b-4 border-orange-500 rounded-full animate-spin"></div>
     </div>
   ) : (
+    <SocketProvider>
     <Router>
       <Navbar />
       <Routes>
@@ -62,19 +69,23 @@ function App() {
               </>
             }
           />
+          <Route path="/lobby" element={<LobbyScreen />} />
+          <Route path="/room/:roomId" element={<Room />} />
           <Route path="/Login" element={<Login />} />
           <Route path="/Signup" element={<Signup />} />
+          <Route
+            path="/Services"
+            element={
+              <>
+                <Services />
+                <Footer />
+              </>
+            }
+          />
+          <Route path="/Services/wound" element={<ImageUploadPage />} />
+          <Route path="/Services/report" element={<ReportPage />} />
         </Route>
 
-        <Route
-          path="/Services"
-          element={
-            <>
-              <Services />
-              <Footer />
-            </>
-          }
-        />
         <Route
           path="/Contact"
           element={
@@ -106,6 +117,7 @@ function App() {
 
       <ToastContainer />
     </Router>
+    </SocketProvider>
   );
 }
 
