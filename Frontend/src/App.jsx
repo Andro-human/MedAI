@@ -23,12 +23,10 @@ import Analytics from "./pages/admin/Analytics.jsx";
 import AdminAppointments from "./pages/admin/Appointments.jsx";
 import Doctors from "./pages/admin/Doctors.jsx";
 import Patients from "./pages/admin/Patients.jsx";
-import { SocketProvider } from "./socket.jsx";
 import ReportPage from "./pages/report.jsx";
 import Room from "./pages/room.jsx";
 import ImageUploadPage from "./pages/woundAnalyser.jsx";
 import { userExists, userNotExists } from "./redux/reducers/auth";
-
 
 function App() {
   const { user, isLoading } = useSelector((state) => state.auth);
@@ -56,67 +54,67 @@ function App() {
     </div>
   ) : (
     <SocketProvider>
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route element={<PublicRoutes user={user} />}>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route element={<PublicRoutes user={user} />}>
+            <Route
+              path="/"
+              element={
+                <>
+                  <Herosection />
+                  <Footer />
+                </>
+              }
+            />
+            <Route path="/lobby" element={<LobbyScreen />} />
+            <Route path="/room/:roomId" element={<Room />} />
+            <Route path="/Login" element={<Login />} />
+            <Route path="/Signup" element={<Signup />} />
+            <Route
+              path="/Services"
+              element={
+                <>
+                  <Services />
+                  <Footer />
+                </>
+              }
+            />
+            <Route path="/Services/wound" element={<ImageUploadPage />} />
+            <Route path="/Services/report" element={<ReportPage />} />
+          </Route>
+
           <Route
-            path="/"
+            path="/Contact"
             element={
               <>
-                <Herosection />
+                <Contact />
                 <Footer />
               </>
             }
           />
-          <Route path="/lobby" element={<LobbyScreen />} />
-          <Route path="/room/:roomId" element={<Room />} />
-          <Route path="/Login" element={<Login />} />
-          <Route path="/Signup" element={<Signup />} />
+
           <Route
-            path="/Services"
             element={
-              <>
-                <Services />
-                <Footer />
-              </>
+              <SocketProvider>
+                <ProtectedRoutes user={user} />{" "}
+              </SocketProvider>
             }
-          />
-          <Route path="/Services/wound" element={<ImageUploadPage />} />
-          <Route path="/Services/report" element={<ReportPage />} />
-        </Route>
+          >
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/dashboard" element={<Userdashboard />} />
+            <Route path="/book-appointment" element={<BookAppointment />} />
 
-        <Route
-          path="/Contact"
-          element={
-            <>
-              <Contact />
-              <Footer />
-            </>
-          }
-        />
+            <Route path="/chat" element={<Chat />} />
 
-        <Route
-          element={
-            <SocketProvider>
-              <ProtectedRoutes user={user} />{" "}
-            </SocketProvider>
-          }
-        >
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/dashboard" element={<Userdashboard />} />
-          <Route path="/book-appointment" element={<BookAppointment />} />
+            <Route path="/appointments" element={<AdminAppointments />} />
+            <Route path="/doctors" element={<Doctors />} />
+            <Route path="/patients" element={<Patients />} />
+          </Route>
+        </Routes>
 
-          <Route path="/chat" element={<Chat />} />
-
-          <Route path="/appointments" element={<AdminAppointments />} />
-          <Route path="/doctors" element={<Doctors />} />
-          <Route path="/patients" element={<Patients />} />
-        </Route>
-      </Routes>
-
-      <ToastContainer />
-    </Router>
+        <ToastContainer />
+      </Router>
     </SocketProvider>
   );
 }
